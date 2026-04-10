@@ -1205,7 +1205,6 @@ async function submitForm(){
 
   try{
     const{blob,file,fileName}=await makePdfFile(d);
-    nt.textContent='공유 준비 중...';
 
     // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
@@ -1213,35 +1212,45 @@ async function submitForm(){
     document.getElementById('doneScreen').classList.add('show');
 
     const doneSection=document.getElementById('doneScreen');
-
     ['kakaoShareBtn','kakaoDownBtn'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.remove();
     });
 
-    // 모바일 Web Share 지원 여부 확인
-    const canShareFile=navigator.canShare&&navigator.canShare({files:[file]});
+    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    if(canShareFile){
+    if(isMobile){
       document.getElementById('doneMsg').innerHTML=
-        `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>아래 버튼으로 카카오톡에 공유하세요.`;
+        `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>아래 버튼을 눌러 카카오톡으로 공유하세요.`;
 
       const shareBtn=document.createElement('button');
       shareBtn.id='kakaoShareBtn';
       shareBtn.innerHTML='💬 카카오톡으로 공유하기';
       shareBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:12px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
+
+      // 버튼 누를 때마다 PDF 새로 생성해서 공유
       shareBtn.onclick=async()=>{
+        shareBtn.innerHTML='⏳ PDF 생성 중...';
+        shareBtn.disabled=true;
         try{
-          await navigator.share({
-            title:`[TBM] ${d.projName||'안전점검조회'}`,
-            text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
-            files:[file]
-          });
-        }catch(e){
-          if(e.name!=='AbortError'){
-            downloadBlob(blob,fileName);
+          const{file:freshFile,blob:freshBlob,fileName:freshName}=await makePdfFile(d);
+          if(navigator.canShare&&navigator.canShare({files:[freshFile]})){
+            await navigator.share({
+              title:`[TBM] ${d.projName||'안전점검조회'}`,
+              text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
+              files:[freshFile]
+            });
+          }else{
+            downloadBlob(freshBlob,freshName);
             toast('다운로드 폴더에서 카카오톡으로 보내주세요.','ok');
           }
+        }catch(e){
+          if(e.name!=='AbortError'){
+            toast('공유 실패. 다시 눌러보세요.','ng');
+          }
+        }finally{
+          shareBtn.innerHTML='💬 카카오톡으로 공유하기';
+          shareBtn.disabled=false;
         }
       };
       doneSection.insertBefore(shareBtn,doneSection.querySelector('.btn-new'));
