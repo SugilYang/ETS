@@ -532,7 +532,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 // ══════════════════════════════════════════════════════════
 
 // 접근 코드 — 관리자 페이지(admin.html)에서 변경 가능
-let ACCESS_CODES = ['ETS2024','SAFETY01'];
+let ACCESS_CODES = ['ets2006','2346072'];
 try{
   const _c = localStorage.getItem('tbm_access_codes');
   if(_c) ACCESS_CODES = JSON.parse(_c);
@@ -542,7 +542,7 @@ try{
 let NOTICE = {
   active: true,
   date: '2026-04-10',
-  message: `안녕하세요. ETS 안전보건관리팀입니다.\n\n📌 이번 주 안전 강조 사항\n• 고소작업 시 안전대 100% 체결 확인\n• 협착 위험구간 접근 전 관리감독자 승인 필수\n• 폭염 대비 수분 보충 및 그늘막 휴식 준수\n\n⚠️ 최근 산재 사례 공유\n인근 현장에서 추락 사고가 발생하였습니다.\n작업 전 발판 상태와 안전난간을 반드시 점검하세요.\n\n문의사항은 안전보건관리책임자에게 연락 바랍니다.`
+  message: `안녕하세요. ETS 경영지원입니다.\n\n📌 이번 주 안전 강조 사항\n• 고소작업 시 안전모 100% 착용 확인\n• 크레인 사용 시 안전보 착용 필수\n• TBM 정착 캠페인 진행 중\n\n⚠️ 최근 산재 사례 공유\n대전 산업현장에서 화재사고가 발생하였습니다.\n사업장 내 외부 화기작업 시 가연물 조심.\n\n문의사항은 010-3469-2346으로 연락 바랍니다.`
 };
 try{
   const _n = localStorage.getItem('tbm_notice_data');
