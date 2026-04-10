@@ -1234,13 +1234,14 @@ async function submitForm(){
     kakaoBtn.innerHTML='💬 카카오톡 열기';
     kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:8px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
     kakaoBtn.onclick=()=>{
-      // 새 탭으로 카카오톡 열기 시도
-      const a=document.createElement('a');
-      a.href='kakaotalk://';
-      a.target='_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const ua=navigator.userAgent.toLowerCase();
+      if(ua.indexOf('android')>-1){
+        // 안드로이드: 인텐트 방식
+        window.location.href='intent:#Intent;package=com.kakao.talk;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
+      } else {
+        // 아이폰
+        window.location.href='kakaotalk://';
+      }
     };
     doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
 
