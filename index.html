@@ -1206,10 +1206,10 @@ async function submitForm(){
   bn.disabled=true;sp.style.display='block';nt.textContent='PDF 생성 중...';
 
   try{
+    // PDF 먼저 생성
     const{blob,file,fileName}=await makePdfFile(d);
-    nt.textContent='공유 준비 중...';
 
-    // 완료 화면 먼저 전환
+    // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
     document.getElementById('navBar').style.display='none';
     document.getElementById('doneScreen').classList.add('show');
@@ -1222,11 +1222,11 @@ async function submitForm(){
       if(el) el.remove();
     });
 
-    // 모바일 Web Share 지원 여부 확인
-    const canShareFile=navigator.canShare&&navigator.canShare({files:[file]});
+    // 모바일 여부 확인
+    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    if(canShareFile){
-      // 모바일: 카카오톡 공유 버튼 표시
+    if(isMobile){
+      // 모바일: 버튼 누를 때 바로 공유창 열기 (PDF는 이미 준비됨)
       document.getElementById('doneMsg').innerHTML=
         `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>아래 버튼으로 카카오톡에 공유하세요.`;
 
@@ -1234,25 +1234,32 @@ async function submitForm(){
       shareBtn.id='kakaoShareBtn';
       shareBtn.innerHTML='💬 카카오톡으로 공유하기';
       shareBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:12px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
+
       shareBtn.onclick=async()=>{
+        // 버튼 누르는 순간 바로 공유창 열기 — PDF는 이미 준비됨
         try{
-          await navigator.share({
-            title:`[TBM] ${d.projName||'안전점검조회'}`,
-            text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
-            files:[file]
-          });
+          if(navigator.canShare&&navigator.canShare({files:[file]})){
+            await navigator.share({
+              title:`[TBM] ${d.projName||'안전점검조회'}`,
+              text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
+              files:[file]
+            });
+          }else{
+            // 파일 공유 안되면 다운로드
+            downloadBlob(blob,fileName);
+            toast('📥 파일 저장됨 — 카카오톡에서 직접 올려주세요','ok');
+          }
         }catch(e){
           if(e.name!=='AbortError'){
-            // 공유 실패시 다운로드로 대체
             downloadBlob(blob,fileName);
-            toast('다운로드 폴더에서 파일을 카카오톡으로 보내주세요.','ok');
+            toast('📥 파일 저장됨 — 카카오톡에서 직접 올려주세요','ok');
           }
         }
       };
       doneSection.insertBefore(shareBtn,doneSection.querySelector('.btn-new'));
 
     }else{
-      // PC or 미지원: 다운로드 버튼
+      // PC: 다운로드 버튼
       document.getElementById('doneMsg').innerHTML=
         `<strong>${esc(d.author)}</strong>님의 TBM PDF가 생성됐습니다.<br>다운로드 후 카카오톡 단톡방에 올려주세요.`;
 
