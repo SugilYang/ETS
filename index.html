@@ -16,35 +16,87 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-/* ── 접근 제어 ── */
-#accessOverlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#0f2922 0%,#1a3d34 60%,#0d2118 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
+/* ── 접근 제어 오버레이 ── */
+#accessOverlay{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#0f2922 0%,#1a3d34 60%,#0d2118 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px;
+}
+#accessOverlay.hide{animation:fadeOut .4s ease forwards}
 @keyframes fadeOut{to{opacity:0;pointer-events:none}}
-@keyframes acShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-.ac-logo{font-size:48px;margin-bottom:8px}
+.ac-logo{font-size:48px;margin-bottom:8px;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes bounceIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .ac-company{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:3px;margin-bottom:4px}
-.ac-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:4px}
+.ac-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.5px}
 .ac-sub{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:36px}
-.ac-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;width:100%;max-width:360px}
-.ac-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:10px}
+.ac-card{
+  background:rgba(255,255,255,.07);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  padding:28px 24px;width:100%;max-width:360px;
+}
+.ac-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:10px;letter-spacing:.5px}
 .ac-input-wrap{position:relative;margin-bottom:14px}
-.ac-input{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);border-radius:13px;padding:14px 48px 14px 16px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:18px;font-weight:700;letter-spacing:4px;outline:none;text-align:center}
-.ac-input:focus{border-color:#2aab8e}
-.ac-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:4px}
-.ac-btn{width:100%;padding:15px;background:linear-gradient(135deg,#2aab8e,#1e8f76);border:none;border-radius:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer}
-.ac-err{color:#f87171;font-size:13px;font-weight:600;text-align:center;margin-top:10px;min-height:18px}
+.ac-input{
+  width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:13px;padding:14px 48px 14px 16px;
+  color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:18px;font-weight:700;
+  letter-spacing:4px;outline:none;text-align:center;transition:border-color .2s;
+}
+.ac-input::placeholder{letter-spacing:1px;font-size:14px;font-weight:400;color:rgba(255,255,255,.35)}
+.ac-input:focus{border-color:var(--teal);background:rgba(42,171,142,.15)}
+.ac-eye{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:4px;
+}
+.ac-btn{
+  width:100%;padding:15px;background:linear-gradient(135deg,var(--teal),var(--teal2));
+  border:none;border-radius:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;
+  font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;
+  box-shadow:0 4px 18px rgba(42,171,142,.4);
+}
+.ac-btn:active{transform:scale(.98)}
+.ac-err{
+  color:#f87171;font-size:13px;font-weight:600;text-align:center;
+  margin-top:10px;min-height:18px;transition:opacity .2s;
+}
+.ac-shake{animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 .ac-footer{font-size:11px;color:rgba(255,255,255,.3);margin-top:28px;text-align:center;line-height:1.7}
 
 /* ── 공지 팝업 ── */
-#noticeModal{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:24px}
-.notice-card{background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.notice-header{background:linear-gradient(135deg,#f59e0b,#d97706);padding:18px 20px;display:flex;align-items:center;gap:10px}
+#noticeModal{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+#noticeModal.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.notice-card{
+  background:#fff;border-radius:20px;padding:0;width:100%;max-width:400px;
+  overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  animation:slideUp .35s cubic-bezier(.34,1.56,.64,1)
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.notice-header{
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  padding:18px 20px;display:flex;align-items:center;gap:10px;
+}
 .notice-header-icon{font-size:22px}
 .notice-header-text{color:#fff;font-size:16px;font-weight:800}
 .notice-header-date{color:rgba(255,255,255,.75);font-size:11px;margin-left:auto}
 .notice-body{padding:20px;font-size:14px;line-height:1.8;color:#1a2b28;white-space:pre-line;max-height:300px;overflow-y:auto}
 .notice-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;gap:10px}
-.notice-close{flex:1;padding:12px;background:linear-gradient(135deg,#2aab8e,#1e8f76);border:none;border-radius:11px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
-.notice-skip{padding:12px 16px;background:#f0f4f3;border:1.5px solid #d4e6e1;border-radius:11px;color:#8aada8;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.notice-close{
+  flex:1;padding:12px;background:linear-gradient(135deg,var(--teal),var(--teal2));
+  border:none;border-radius:11px;color:#fff;font-family:'Noto Sans KR',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;
+}
+.notice-skip{
+  padding:12px 16px;background:#f0f4f3;border:1.5px solid #d4e6e1;
+  border-radius:11px;color:#8aada8;font-family:'Noto Sans KR',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
+}
 
 .hdr{
   background:linear-gradient(135deg,var(--teal) 0%,var(--teal2) 100%);
@@ -236,7 +288,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 </head>
 <body>
 
-<!-- 접근 제어 -->
+<!-- ══════════════════════════════════════
+     접근 제어 오버레이
+══════════════════════════════════════ -->
 <div id="accessOverlay">
   <div class="ac-logo">🦺</div>
   <div class="ac-company">ETS SAFETY MANAGEMENT</div>
@@ -245,17 +299,22 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
   <div class="ac-card">
     <div class="ac-label">🔐 접근 코드를 입력하세요</div>
     <div class="ac-input-wrap">
-      <input class="ac-input" type="password" id="acInput" placeholder="접근 코드 입력" maxlength="20" onkeydown="if(event.key==='Enter')tryAccess()">
-      <button class="ac-eye" onclick="toggleAcEye()" id="acEyeBtn">👁</button>
+      <input class="ac-input" type="password" id="acInput" placeholder="접근 코드 입력"
+        maxlength="20" onkeydown="if(event.key==='Enter')tryAccess()">
+      <button class="ac-eye" onclick="toggleAcEye()" id="acEyeBtn" title="보기/숨기기">👁</button>
     </div>
     <button class="ac-btn" onclick="tryAccess()">입장하기 →</button>
     <div class="ac-err" id="acErr"></div>
   </div>
-  <div class="ac-footer">허가된 ETS 임직원 및 협력업체 근로자만 사용 가능합니다<br>문의: 안전보건관리책임자</div>
+  <div class="ac-footer">
+    허가된 ETS 임직원 및 협력업체 근로자만 사용 가능합니다<br>
+    문의: 경영지원담당자  </div>
 </div>
 
-<!-- 공지 팝업 -->
-<div id="noticeModal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:24px">
+<!-- ══════════════════════════════════════
+     공지사항 팝업
+══════════════════════════════════════ -->
+<div id="noticeModal">
   <div class="notice-card">
     <div class="notice-header">
       <span class="notice-header-icon">📢</span>
@@ -468,78 +527,88 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
 <script>
 // ══════════════════════════════════════════════════════════
-//  접근 코드 + 공지 설정 (GitHub에서 이 부분만 수정하세요)
+//  ⚙️  설정 — localStorage 우선, 없으면 기본값 사용
 // ══════════════════════════════════════════════════════════
-const ACCESS_CODES = ['ETS2024','SAFETY01'];
 
-const NOTICE = {
+// 접근 코드 — 관리자 페이지(admin.html)에서 변경 가능
+let ACCESS_CODES = ['1111'];
+try{
+  const _c = localStorage.getItem('tbm_access_codes');
+  if(_c) ACCESS_CODES = JSON.parse(_c);
+}catch(e){}
+
+// 공지사항 — 관리자 페이지(admin.html)에서 변경 가능
+let NOTICE = {
   active: true,
   date: '2026-04-10',
-  message: `안녕하세요. ETS 안전보건관리팀입니다.
-
-📌 이번 주 안전 강조 사항
-• 고소작업 시 안전대 100% 체결 확인
-• 협착 위험구간 접근 전 관리감독자 승인 필수
-• 폭염 대비 수분 보충 및 그늘막 휴식 준수
-
-⚠️ 최근 산재 사례 공유
-인근 현장에서 추락 사고가 발생하였습니다.
-작업 전 발판 상태와 안전난간을 반드시 점검하세요.
-
-문의사항은 안전보건관리책임자에게 연락 바랍니다.`
+  message: `안녕하세요. ETS 경영지원팀입니다.\n\n📌 이번 주 안전 강조 사항\n• 고소작업 시 안전모 착용 확인\n• 협착 위험구간 접근 전 관리감독자 승인 필수\n• 건조한 날씨 화재 발생 주의\n\n⚠️ 최근 산재 사례 공유\n대전에서 화재로 인한 산업재해가 발생했습니다.\n화기작업 시에는 필히 사전 허가필요합니다.\n\n문의사항은 010-3469-2346으로 연락 바랍니다
 };
+try{
+  const _n = localStorage.getItem('tbm_notice_data');
+  if(_n) NOTICE = JSON.parse(_n);
+}catch(e){}
 
 // ══════════════════════════════════════════════════════════
 //  접근 제어 로직
 // ══════════════════════════════════════════════════════════
+let accessGranted = false;
+
 function tryAccess(){
-  const val=document.getElementById('acInput').value.trim();
-  const ok=ACCESS_CODES.some(c=>c===val);
+  const val = document.getElementById('acInput').value.trim();
+  const ok = ACCESS_CODES.some(c => c === val);
   if(ok){
-    const ov=document.getElementById('accessOverlay');
-    ov.style.animation='fadeOut .4s ease forwards';
-    setTimeout(()=>{ov.style.display='none';showNoticeIfNeeded();},400);
-  }else{
-    const card=document.querySelector('.ac-card');
-    document.getElementById('acErr').textContent='❌ 접근 코드가 올바르지 않습니다.';
-    card.style.animation='none';void card.offsetWidth;
-    card.style.animation='acShake .35s ease';
+    accessGranted = true;
+    const ov = document.getElementById('accessOverlay');
+    ov.classList.add('hide');
+    setTimeout(()=>{ ov.style.display='none'; showNoticeIfNeeded(); }, 400);
+  } else {
+    const card = document.querySelector('.ac-card');
+    const err = document.getElementById('acErr');
+    err.textContent = '❌ 접근 코드가 올바르지 않습니다. 담당자에게 문의하세요.';
+    card.classList.remove('ac-shake');
+    void card.offsetWidth;
+    card.classList.add('ac-shake');
     document.getElementById('acInput').value='';
     document.getElementById('acInput').focus();
   }
 }
 
 function toggleAcEye(){
-  const inp=document.getElementById('acInput');
-  inp.type=inp.type==='password'?'text':'password';
-  document.getElementById('acEyeBtn').textContent=inp.type==='password'?'👁':'🙈';
+  const inp = document.getElementById('acInput');
+  inp.type = inp.type==='password' ? 'text' : 'password';
+  document.getElementById('acEyeBtn').textContent = inp.type==='password' ? '👁' : '🙈';
 }
 
+// ══════════════════════════════════════════════════════════
+//  공지사항 로직
+// ══════════════════════════════════════════════════════════
 function showNoticeIfNeeded(){
   if(!NOTICE.active) return;
-  const skipKey='tbm_notice_skip_'+NOTICE.date;
-  if(localStorage.getItem(skipKey)==='1') return;
-  document.getElementById('noticeDate').textContent=NOTICE.date;
-  document.getElementById('noticeBody').textContent=NOTICE.message;
-  document.getElementById('noticeModal').style.display='flex';
+  // "오늘 하루 안 보기" 체크
+  const skipKey = 'tbm_notice_skip_' + NOTICE.date;
+  if(localStorage.getItem(skipKey) === '1') return;
+  document.getElementById('noticeDate').textContent = NOTICE.date;
+  document.getElementById('noticeBody').textContent = NOTICE.message;
+  document.getElementById('noticeModal').classList.add('show');
 }
 
 function closeNotice(){
-  document.getElementById('noticeModal').style.display='none';
+  document.getElementById('noticeModal').classList.remove('show');
 }
 
 function skipNotice(){
-  localStorage.setItem('tbm_notice_skip_'+NOTICE.date,'1');
+  const skipKey = 'tbm_notice_skip_' + NOTICE.date;
+  localStorage.setItem(skipKey, '1');
   closeNotice();
 }
 
 // ══════════════════════════════════════════════════════════
-
 const TOTAL=6;
 let cur=0;
 const photos=[null,null,null];
-const TBM_DURATION = Math.floor(Math.random()*6)+15;
-let incidentStatus='none';
+// TBM 진행시간: 15~20분 랜덤
+const TBM_DURATION = Math.floor(Math.random()*6)+15; // 15,16,17,18,19,20 중 하나
+let incidentStatus='none'; // 환자발생 여부
 document.getElementById('workDate').valueAsDate=new Date();
 
 function updProg(n){
@@ -1026,7 +1095,7 @@ async function buildPDFCanvas(d){
         <div style="font-size:11px;color:#f59e0b;font-weight:700;margin-top:4px">💬 카카오톡 단톡방 공유 완료됨.</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:10px;color:#8aada8;margin-bottom:2px">개발자 양수길 허락없이 무단배포금지</div>
+        <div style="font-size:10px;color:#8aada8;margin-bottom:2px">안전보건관리책임자</div>
         <div style="width:80px;height:1px;background:#d4e6e1;margin-top:18px"></div>
       </div>
     </div>
@@ -1170,8 +1239,9 @@ async function submitForm(){
           });
         }catch(e){
           if(e.name!=='AbortError'){
+            // 공유 실패시 다운로드로 대체
             downloadBlob(blob,fileName);
-            toast('다운로드 폴더에서 카카오톡으로 보내주세요.','ok');
+            toast('다운로드 폴더에서 파일을 카카오톡으로 보내주세요.','ok');
           }
         }
       };
