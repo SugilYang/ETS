@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TBM 관리자 설정</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+:root{
+  --teal:#2aab8e;--teal2:#1e8f76;--teal-l:#e8f7f4;--teal-m:#b2e4d8;
+  --bg:#f0f4f3;--white:#fff;--border:#d4e6e1;
+  --text:#1a2b28;--text2:#4a6860;--text3:#8aada8;
+  --danger:#e05252;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* 로그인 */
+#loginWrap{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px;
+  background:linear-gradient(160deg,#0f2922 0%,#1a3d34 60%,#0d2118 100%);
+}
+.lg-icon{font-size:44px;margin-bottom:8px}
+.lg-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.lg-sub{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:32px}
+.lg-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;width:100%;max-width:340px}
+.lg-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:8px}
+.lg-input{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);border-radius:12px;padding:13px 16px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;outline:none;text-align:center;margin-bottom:14px}
+.lg-input:focus{border-color:var(--teal)}
+.lg-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;border-radius:12px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.lg-err{color:#f87171;font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+
+/* 관리자 패널 */
+#adminWrap{display:none;padding:0 0 80px}
+.adm-hdr{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:18px 20px;display:flex;align-items:center;justify-content:space-between}
+.adm-hdr-title{font-size:18px;font-weight:800;color:#fff}
+.adm-hdr-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.adm-logout{background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:7px 14px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+
+.section{background:var(--white);border-radius:var(--r);margin:16px;padding:20px;box-shadow:0 2px 12px rgba(42,171,142,.09);border:1px solid rgba(42,171,142,.07)}
+.sec-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sec-desc{font-size:12px;color:var(--text3);margin-bottom:18px;line-height:1.6}
+.fld{margin-bottom:14px}
+.fld:last-child{margin-bottom:0}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
+input[type=text],textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+input[type=text]:focus,textarea:focus{border-color:var(--teal);background:var(--white)}
+textarea{resize:vertical;min-height:120px;line-height:1.7}
+
+/* 토글 */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:14px;font-weight:600;color:var(--text)}
+.toggle-desc{font-size:12px;color:var(--text3);margin-top:2px}
+.tog{position:relative;width:48px;height:26px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-slider{position:absolute;inset:0;background:#ccc;border-radius:13px;cursor:pointer;transition:.3s}
+.tog-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+.tog input:checked+.tog-slider{background:var(--teal)}
+.tog input:checked+.tog-slider:before{transform:translateX(22px)}
+
+/* 저장 버튼 */
+.save-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;border-radius:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;box-shadow:0 4px 14px rgba(42,171,142,.35)}
+.save-btn:active{transform:scale(.98)}
+.del-btn{width:100%;padding:12px;background:#fff;border:1.5px solid var(--danger);border-radius:11px;color:var(--danger);font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+
+/* 코드 목록 */
+.code-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.code-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px}
+.code-text{flex:1;font-size:14px;font-weight:700;color:var(--text);letter-spacing:1px}
+.code-del{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.code-add-row{display:flex;gap:8px}
+.code-add-row input{flex:1}
+.code-add-btn{padding:12px 16px;background:var(--teal-l);border:1.5px solid var(--teal-m);border-radius:11px;color:var(--teal2);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* 토스트 */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-16px);background:#3d4551;color:white;border-radius:11px;padding:11px 20px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{background:var(--teal)}#toast.ng{background:var(--danger)}
+
+/* 링크 박스 */
+.link-box{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--teal2);word-break:break-all;margin-bottom:8px;font-weight:600}
+.go-btn{display:block;width:100%;padding:13px;background:var(--teal-l);border:1.5px solid var(--teal-m);border-radius:11px;color:var(--teal2);font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- 관리자 로그인 -->
+<div id="loginWrap">
+  <div class="lg-icon">⚙️</div>
+  <div class="lg-title">관리자 설정</div>
+  <div class="lg-sub">TBM 안전점검조회 · ETS</div>
+  <div class="lg-card">
+    <div class="lg-label">🔐 관리자 비밀번호</div>
+    <input class="lg-input" type="password" id="adminPwInput" placeholder="비밀번호 입력" maxlength="30" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="lg-btn" onclick="adminLogin()">로그인 →</button>
+    <div class="lg-err" id="lgErr"></div>
+  </div>
+</div>
+
+<!-- 관리자 패널 -->
+<div id="adminWrap">
+  <div class="adm-hdr">
+    <div>
+      <div class="adm-hdr-title">⚙️ TBM 관리자 설정</div>
+      <div class="adm-hdr-sub">ETS 안전보건관리팀</div>
+    </div>
+    <button class="adm-logout" onclick="adminLogout()">로그아웃</button>
+  </div>
+
+  <!-- TBM 앱 바로가기 -->
+  <div class="section">
+    <div class="sec-title">🔗 TBM 앱 링크</div>
+    <div class="sec-desc">근로자들에게 이 링크를 공유하세요</div>
+    <div class="link-box" id="tbmLinkBox">링크 로딩 중...</div>
+    <button class="go-btn" onclick="copyLink()">📋 링크 복사하기</button>
+    <a class="go-btn" id="tbmGoBtn" href="#" target="_blank">↗ TBM 앱 열기</a>
+  </div>
+
+  <!-- 접근 코드 관리 -->
+  <div class="section">
+    <div class="sec-title">🔐 접근 코드 관리</div>
+    <div class="sec-desc">근로자가 TBM 앱 입장 시 입력해야 하는 코드입니다.<br>여러 개 등록 가능하고 모두 유효합니다.</div>
+    <div class="code-list" id="codeList"></div>
+    <div class="code-add-row">
+      <input type="text" id="newCodeInput" placeholder="새 코드 입력 (영문/숫자)" maxlength="20" onkeydown="if(event.key==='Enter')addCode()">
+      <button class="code-add-btn" onclick="addCode()">+ 추가</button>
+    </div>
+    <button class="save-btn" onclick="saveCodes()">✅ 접근 코드 저장</button>
+  </div>
+
+  <!-- 공지사항 관리 -->
+  <div class="section">
+    <div class="sec-title">📢 공지사항 관리</div>
+    <div class="sec-desc">앱 입장 후 팝업으로 표시됩니다. 안전 강조사항이나 주의사항을 입력하세요.</div>
+    <div class="fld">
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">공지사항 표시</div>
+          <div class="toggle-desc">끄면 팝업이 뜨지 않습니다</div>
+        </div>
+        <label class="tog">
+          <input type="checkbox" id="noticeActive" checked>
+          <span class="tog-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="fld">
+      <label>공지 날짜</label>
+      <input type="text" id="noticeDate" placeholder="예) 2026-04-10">
+    </div>
+    <div class="fld">
+      <label>공지 내용</label>
+      <textarea id="noticeMsg" placeholder="공지 내용을 입력하세요&#10;&#10;예) 이번 주 안전 강조사항&#10;• 고소작업 시 안전대 체결 필수&#10;• 화기작업 전 소화기 배치 확인" rows="8"></textarea>
+    </div>
+    <button class="save-btn" onclick="saveNotice()">✅ 공지사항 저장</button>
+    <button class="del-btn" onclick="clearNotice()">🗑 공지 내용 비우기</button>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  관리자 비밀번호 (이것만 바꾸세요)
+// ══════════════════════════════════════════════════════
+const ADMIN_PASSWORD = 'ETS관리자2024';
+
+// ══════════════════════════════════════════════════════
+//  localStorage 키 (TBM 앱과 공유)
+// ══════════════════════════════════════════════════════
+const KEY_CODES  = 'tbm_access_codes';
+const KEY_NOTICE = 'tbm_notice_data';
+
+// 기본값
+const DEFAULT_CODES  = ['ETS2024','SAFETY01'];
+const DEFAULT_NOTICE = {
+  active: true,
+  date: '2026-04-10',
+  message: '안녕하세요. ETS 안전보건관리팀입니다.\n\n📌 이번 주 안전 강조 사항\n• 고소작업 시 안전대 100% 체결 확인\n• 협착 위험구간 접근 전 관리감독자 승인 필수\n\n문의사항은 안전보건관리책임자에게 연락 바랍니다.'
+};
+
+let currentCodes = [];
+
+function adminLogin(){
+  const pw = document.getElementById('adminPwInput').value;
+  if(pw === ADMIN_PASSWORD){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('adminWrap').style.display='block';
+    loadAll();
+  } else {
+    document.getElementById('lgErr').textContent='❌ 비밀번호가 틀렸습니다.';
+    document.getElementById('adminPwInput').value='';
+  }
+}
+
+function adminLogout(){
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('adminWrap').style.display='none';
+  document.getElementById('adminPwInput').value='';
+  document.getElementById('lgErr').textContent='';
+}
+
+function loadAll(){
+  // 링크 설정
+  const base = location.href.replace(/\/admin\.html.*$/,'').replace(/\/$/,'');
+  const tbmUrl = base + '/index.html';
+  document.getElementById('tbmLinkBox').textContent = tbmUrl;
+  document.getElementById('tbmGoBtn').href = tbmUrl;
+
+  // 접근 코드 로드
+  try{
+    const saved = localStorage.getItem(KEY_CODES);
+    currentCodes = saved ? JSON.parse(saved) : [...DEFAULT_CODES];
+  }catch(e){ currentCodes = [...DEFAULT_CODES]; }
+  renderCodes();
+
+  // 공지사항 로드
+  try{
+    const saved = localStorage.getItem(KEY_NOTICE);
+    const n = saved ? JSON.parse(saved) : DEFAULT_NOTICE;
+    document.getElementById('noticeActive').checked = n.active !== false;
+    document.getElementById('noticeDate').value = n.date || '';
+    document.getElementById('noticeMsg').value = n.message || '';
+  }catch(e){
+    const n = DEFAULT_NOTICE;
+    document.getElementById('noticeActive').checked = n.active;
+    document.getElementById('noticeDate').value = n.date;
+    document.getElementById('noticeMsg').value = n.message;
+  }
+  // 오늘 날짜 자동 입력
+  if(!document.getElementById('noticeDate').value){
+    document.getElementById('noticeDate').value = new Date().toISOString().slice(0,10);
+  }
+}
+
+function renderCodes(){
+  const list = document.getElementById('codeList');
+  list.innerHTML = '';
+  if(currentCodes.length === 0){
+    list.innerHTML = '<div style="color:#8aada8;font-size:13px;padding:8px 0">등록된 코드가 없습니다</div>';
+    return;
+  }
+  currentCodes.forEach((code,i)=>{
+    const item = document.createElement('div');
+    item.className = 'code-item';
+    item.innerHTML = `
+      <span class="code-text">${escHtml(code)}</span>
+      <button class="code-del" onclick="removeCode(${i})" title="삭제">×</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function addCode(){
+  const inp = document.getElementById('newCodeInput');
+  const val = inp.value.trim().toUpperCase();
+  if(!val){ toast('코드를 입력해주세요','ng'); return; }
+  if(currentCodes.includes(val)){ toast('이미 있는 코드입니다','ng'); return; }
+  currentCodes.push(val);
+  renderCodes();
+  inp.value='';
+  toast('코드 추가됨 — 저장 버튼을 눌러주세요','ok');
+}
+
+function removeCode(i){
+  if(currentCodes.length <= 1){ toast('코드는 최소 1개 이상이어야 합니다','ng'); return; }
+  currentCodes.splice(i,1);
+  renderCodes();
+  toast('코드 삭제됨 — 저장 버튼을 눌러주세요','ok');
+}
+
+function saveCodes(){
+  if(currentCodes.length === 0){ toast('코드가 없습니다. 최소 1개 추가하세요','ng'); return; }
+  localStorage.setItem(KEY_CODES, JSON.stringify(currentCodes));
+  toast('✅ 접근 코드 저장 완료!','ok');
+}
+
+function saveNotice(){
+  const n = {
+    active: document.getElementById('noticeActive').checked,
+    date: document.getElementById('noticeDate').value.trim(),
+    message: document.getElementById('noticeMsg').value.trim()
+  };
+  if(n.active && !n.message){ toast('공지 내용을 입력해주세요','ng'); return; }
+  localStorage.setItem(KEY_NOTICE, JSON.stringify(n));
+  toast('✅ 공지사항 저장 완료!','ok');
+}
+
+function clearNotice(){
+  document.getElementById('noticeMsg').value='';
+  document.getElementById('noticeActive').checked=false;
+  toast('공지 내용 비워짐 — 저장 버튼을 눌러야 반영됩니다','ok');
+}
+
+function copyLink(){
+  const link = document.getElementById('tbmLinkBox').textContent;
+  navigator.clipboard.writeText(link).then(()=>{
+    toast('✅ 링크 복사 완료!','ok');
+  }).catch(()=>{
+    toast('링크를 직접 선택해서 복사해주세요','ng');
+  });
+}
+
+function escHtml(v){ return String(v||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='';t.classList.add('show',type);
+  clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
