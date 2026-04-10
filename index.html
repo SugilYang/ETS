@@ -360,12 +360,12 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
   <div class="step active" id="s0">
     <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">STEP 1 / 6</div><div class="h-ttl">기본 정보</div></div></div>
     <div class="card">
-      <div class="row2">
-        <div class="fld">
+      <div class="row2" style="margin-bottom:15px">
+        <div class="fld" style="margin-bottom:0">
           <label>작업일자 <span class="req">*</span></label>
           <input type="date" id="workDate">
         </div>
-        <div class="fld">
+        <div class="fld" style="margin-bottom:0">
           <label>관리감독자 <span class="req">*</span></label>
           <input type="text" id="author" placeholder="이름">
         </div>
@@ -1219,45 +1219,60 @@ async function submitForm(){
     const doneSection=document.getElementById('doneScreen');
 
     // 기존 버튼 제거
-    ['kakaoShareBtn','kakaoDownBtn','kakaoOpenBtn'].forEach(id=>{
+    ['kakaoShareBtn','kakaoDownBtn','kakaoOpenBtn','shareGuide'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.remove();
     });
 
     document.getElementById('doneMsg').innerHTML=`
-      <strong>${esc(d.author)}</strong>님의 TBM PDF가 저장됐습니다.<br>
-      <span style="font-size:13px;color:#8aada8">📂 다운로드 폴더에서 확인하세요</span>
+      <strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다!<br>
+      <span style="font-size:13px;color:#8aada8">PDF가 다운로드 폴더에 저장됐어요</span>
     `;
 
-    // 카카오톡 열기 버튼
+    // 카카오톡 공유 버튼 — Web Share API 시도, 안되면 앱 직접 열기
     const kakaoBtn=document.createElement('button');
     kakaoBtn.id='kakaoOpenBtn';
-    kakaoBtn.innerHTML='💬 카카오톡 열어서 전송하기';
-    kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 20px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:8px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
-    kakaoBtn.onclick=()=>{
-      // 카카오톡 앱 열기
-      window.location.href='kakaotalk://';
-      // 앱이 없을 경우 대비 1.5초 후 스토어로
-      setTimeout(()=>{
-        const ua=navigator.userAgent.toLowerCase();
-        if(ua.indexOf('android')>-1){
-          window.location.href='market://details?id=com.kakao.talk';
-        }else if(ua.indexOf('iphone')>-1||ua.indexOf('ipad')>-1){
-          window.location.href='https://apps.apple.com/app/id362057947';
+    kakaoBtn.innerHTML='💬 카카오톡으로 공유하기';
+    kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 20px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:10px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
+
+    kakaoBtn.onclick=async()=>{
+      // 먼저 Web Share API 시도
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({
+            title:`[TBM] ${d.projName||'안전점검조회'}`,
+            text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
+            files:[file]
+          });
+          return;
+        }catch(e){
+          if(e.name==='AbortError') return;
         }
-      },1500);
+      }
+      // Web Share 안되면 카카오톡 앱 직접 열기
+      const ua=navigator.userAgent.toLowerCase();
+      if(ua.indexOf('android')>-1){
+        const intent='intent://send#Intent;package=com.kakao.talk;scheme=kakaolink;end';
+        window.location.href=intent;
+        setTimeout(()=>{
+          window.location.href='https://play.google.com/store/apps/details?id=com.kakao.talk';
+        },2000);
+      }else{
+        window.location.href='kakaotalk://';
+        setTimeout(()=>{
+          window.location.href='https://apps.apple.com/app/id362057947';
+        },2000);
+      }
     };
     doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
 
-    // 사용 안내
+    // 안내 문구
     const guide=document.createElement('div');
-    guide.style.cssText=`font-size:12px;color:#8aada8;line-height:1.8;margin-bottom:16px;text-align:left;width:100%;max-width:300px;background:#f0f4f3;border-radius:10px;padding:12px 14px;`;
+    guide.id='shareGuide';
+    guide.style.cssText=`font-size:12px;color:#8aada8;line-height:1.9;margin-bottom:16px;text-align:left;width:100%;max-width:300px;background:#f0f4f3;border-radius:10px;padding:12px 14px;`;
     guide.innerHTML=`
-      <strong style="color:#4a6860">전송 방법</strong><br>
-      ① 위 버튼으로 카카오톡 열기<br>
-      ② 단톡방 입장<br>
-      ③ + 버튼 → 파일 → 다운로드 폴더<br>
-      ④ PDF 파일 선택 후 전송
+      <strong style="color:#4a6860">📌 공유가 안될 경우</strong><br>
+      다운로드 알림창 → <strong style="color:#1a2b28">공유</strong> 탭 → 카카오톡 선택
     `;
     doneSection.insertBefore(guide,doneSection.querySelector('.btn-new'));
 
