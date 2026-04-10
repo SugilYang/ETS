@@ -1234,7 +1234,13 @@ async function submitForm(){
     kakaoBtn.innerHTML='💬 카카오톡 열기';
     kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:8px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
     kakaoBtn.onclick=()=>{
-      window.location.href='kakaotalk://';
+      // 새 탭으로 카카오톡 열기 시도
+      const a=document.createElement('a');
+      a.href='kakaotalk://';
+      a.target='_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     };
     doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
 
