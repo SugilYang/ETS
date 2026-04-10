@@ -512,7 +512,6 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
 <div class="nav" id="navBar">
   <button class="btn-prev" id="bPrev" onclick="go(-1)" disabled>‹</button>
-  <button class="btn-preview" id="bPrev2" onclick="previewPDF()" title="PDF 미리보기" style="display:none">👁 PDF</button>
   <button class="btn-next" id="bNext" onclick="go(1)">
     <div class="spin" id="spin"></div>
     <span id="nTxt">다음 단계 →</span>
@@ -624,7 +623,6 @@ function updProg(n){
   }
   document.getElementById('bPrev').disabled=n===0;
   document.getElementById('nTxt').textContent=n===TOTAL-1?'📄 PDF 생성 및 공유':'다음 단계 →';
-  document.getElementById('bPrev2').style.display=n===TOTAL-1?'flex':'none';
 }
 
 function go(dir){
@@ -1236,7 +1234,7 @@ async function submitForm(){
     kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 20px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:10px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
 
     kakaoBtn.onclick=async()=>{
-      // 먼저 Web Share API 시도
+      // Web Share API 로 공유창 열기
       if(navigator.canShare&&navigator.canShare({files:[file]})){
         try{
           await navigator.share({
@@ -1244,24 +1242,14 @@ async function submitForm(){
             text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
             files:[file]
           });
-          return;
         }catch(e){
-          if(e.name==='AbortError') return;
+          if(e.name!=='AbortError'){
+            toast('공유 실패 — 다운로드 알림에서 공유를 눌러주세요','ng');
+          }
         }
-      }
-      // Web Share 안되면 카카오톡 앱 직접 열기
-      const ua=navigator.userAgent.toLowerCase();
-      if(ua.indexOf('android')>-1){
-        const intent='intent://send#Intent;package=com.kakao.talk;scheme=kakaolink;end';
-        window.location.href=intent;
-        setTimeout(()=>{
-          window.location.href='https://play.google.com/store/apps/details?id=com.kakao.talk';
-        },2000);
       }else{
-        window.location.href='kakaotalk://';
-        setTimeout(()=>{
-          window.location.href='https://apps.apple.com/app/id362057947';
-        },2000);
+        // Web Share 미지원시 안내
+        toast('다운로드 알림창 → 공유 → 카카오톡 선택하세요','ok');
       }
     };
     doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
