@@ -1206,8 +1206,10 @@ async function submitForm(){
   bn.disabled=true;sp.style.display='block';nt.textContent='PDF 생성 중...';
 
   try{
-    // PDF 먼저 생성
     const{blob,file,fileName}=await makePdfFile(d);
+
+    // 자동 다운로드
+    downloadBlob(blob,fileName);
 
     // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
@@ -1217,59 +1219,47 @@ async function submitForm(){
     const doneSection=document.getElementById('doneScreen');
 
     // 기존 버튼 제거
-    ['kakaoShareBtn','kakaoDownBtn'].forEach(id=>{
+    ['kakaoShareBtn','kakaoDownBtn','kakaoOpenBtn'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.remove();
     });
 
-    // 모바일 여부 확인
-    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    document.getElementById('doneMsg').innerHTML=`
+      <strong>${esc(d.author)}</strong>님의 TBM PDF가 저장됐습니다.<br>
+      <span style="font-size:13px;color:#8aada8">📂 다운로드 폴더에서 확인하세요</span>
+    `;
 
-    if(isMobile){
-      // 모바일: 버튼 누를 때 바로 공유창 열기 (PDF는 이미 준비됨)
-      document.getElementById('doneMsg').innerHTML=
-        `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>아래 버튼으로 카카오톡에 공유하세요.`;
-
-      const shareBtn=document.createElement('button');
-      shareBtn.id='kakaoShareBtn';
-      shareBtn.innerHTML='💬 카카오톡으로 공유하기';
-      shareBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:12px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
-
-      shareBtn.onclick=async()=>{
-        // 버튼 누르는 순간 바로 공유창 열기 — PDF는 이미 준비됨
-        try{
-          if(navigator.canShare&&navigator.canShare({files:[file]})){
-            await navigator.share({
-              title:`[TBM] ${d.projName||'안전점검조회'}`,
-              text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
-              files:[file]
-            });
-          }else{
-            // 파일 공유 안되면 다운로드
-            downloadBlob(blob,fileName);
-            toast('📥 파일 저장됨 — 카카오톡에서 직접 올려주세요','ok');
-          }
-        }catch(e){
-          if(e.name!=='AbortError'){
-            downloadBlob(blob,fileName);
-            toast('📥 파일 저장됨 — 카카오톡에서 직접 올려주세요','ok');
-          }
+    // 카카오톡 열기 버튼
+    const kakaoBtn=document.createElement('button');
+    kakaoBtn.id='kakaoOpenBtn';
+    kakaoBtn.innerHTML='💬 카카오톡 열어서 전송하기';
+    kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 20px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:8px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
+    kakaoBtn.onclick=()=>{
+      // 카카오톡 앱 열기
+      window.location.href='kakaotalk://';
+      // 앱이 없을 경우 대비 1.5초 후 스토어로
+      setTimeout(()=>{
+        const ua=navigator.userAgent.toLowerCase();
+        if(ua.indexOf('android')>-1){
+          window.location.href='market://details?id=com.kakao.talk';
+        }else if(ua.indexOf('iphone')>-1||ua.indexOf('ipad')>-1){
+          window.location.href='https://apps.apple.com/app/id362057947';
         }
-      };
-      doneSection.insertBefore(shareBtn,doneSection.querySelector('.btn-new'));
+      },1500);
+    };
+    doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
 
-    }else{
-      // PC: 다운로드 버튼
-      document.getElementById('doneMsg').innerHTML=
-        `<strong>${esc(d.author)}</strong>님의 TBM PDF가 생성됐습니다.<br>다운로드 후 카카오톡 단톡방에 올려주세요.`;
-
-      const dlBtn=document.createElement('button');
-      dlBtn.id='kakaoDownBtn';
-      dlBtn.innerHTML='📥 PDF 다운로드';
-      dlBtn.style.cssText=`background:#2aab8e;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:12px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(42,171,142,.35);`;
-      dlBtn.onclick=()=>downloadBlob(blob,fileName);
-      doneSection.insertBefore(dlBtn,doneSection.querySelector('.btn-new'));
-    }
+    // 사용 안내
+    const guide=document.createElement('div');
+    guide.style.cssText=`font-size:12px;color:#8aada8;line-height:1.8;margin-bottom:16px;text-align:left;width:100%;max-width:300px;background:#f0f4f3;border-radius:10px;padding:12px 14px;`;
+    guide.innerHTML=`
+      <strong style="color:#4a6860">전송 방법</strong><br>
+      ① 위 버튼으로 카카오톡 열기<br>
+      ② 단톡방 입장<br>
+      ③ + 버튼 → 파일 → 다운로드 폴더<br>
+      ④ PDF 파일 선택 후 전송
+    `;
+    doneSection.insertBefore(guide,doneSection.querySelector('.btn-new'));
 
   }catch(e){
     console.error(e);
