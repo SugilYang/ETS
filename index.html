@@ -625,7 +625,7 @@ function updProg(n){
     document.getElementById('d'+i).className='dot'+(i<n?' done':i===n?' on':'');
   }
   document.getElementById('bPrev').disabled=n===0;
-  document.getElementById('nTxt').textContent=n===TOTAL-1?'📄 PDF 생성 및 공유':'다음 단계 →';
+  document.getElementById('nTxt').textContent=n===TOTAL-1?'🖼 이미지 생성 및 공유':'다음 단계 →';
 }
 
 function go(dir){
@@ -1150,12 +1150,174 @@ async function buildPDFCanvas(d){
   return doc;
 }
 
-async function makePdfFile(d){
+async function makeImageFile(d){
+  // 기존 buildPDFCanvas 에서 canvas 만드는 부분 재활용
+  const wrap=document.createElement('div');
+  wrap.id='pdfRender';
+  wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#1a2b28;padding:0;margin:0;`;
+
+  // buildPDFCanvas 와 동일한 HTML 구성 (doc 없이 canvas만)
   const doc=await buildPDFCanvas(d);
-  const blob=doc.output('blob');
-  const fileName=`${(d.workDate||'TBM').replace(/-/g,'')}_${d.author||'작성자'}_TBM.pdf`;
-  const file=new File([blob],fileName,{type:'application/pdf'});
-  return{doc,blob,file,fileName};
+  // canvas 를 직접 뽑는 대신 buildPDFCanvas 내부에서 만든 canvas 재활용하기 어려우므로
+  // 이미지 데이터를 PDF blob에서 추출하지 않고 html2canvas 직접 호출
+  const pdfWrap=document.getElementById('pdfRender');
+  // buildPDFCanvas 가 wrap 을 지우므로 다시 만들어야 함
+  // 대신 doc 의 첫 페이지 이미지 데이터를 PNG 로 변환
+  const imgData=doc.output('datauristring');
+  // datauri 에서 blob 생성
+  const base64=imgData.split(',')[1];
+  const binary=atob(base64);
+  const arr=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
+  const pdfBlob=new Blob([arr],{type:'application/pdf'});
+
+  // PDF 대신 canvas 로 이미지 직접 생성
+  const imgCanvas=await buildImageCanvas(d);
+  const imgBlob=await new Promise(res=>imgCanvas.toBlob(res,'image/jpeg',0.92));
+  const fileName=`${(d.workDate||'TBM').replace(/-/g,'')}_${d.author||'작성자'}_TBM.jpg`;
+  const file=new File([imgBlob],fileName,{type:'image/jpeg'});
+  return{blob:imgBlob,file,fileName};
+}
+
+async function buildImageCanvas(d){
+  const validPhotos=photos.filter(Boolean);
+  const photoCount=validPhotos.length;
+  const photoImgTags=validPhotos.map(src=>`
+    <img src="${src}" style="width:${photoCount===1?'100%':photoCount===2?'calc(50% - 4px)':'calc(33.33% - 6px)'};aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:inline-block;margin:0 2px">
+  `).join('');
+
+  const safetyRows=d.hazardSafety.length
+    ? d.hazardSafety.map((h,i)=>{
+        const riskColor=h.risk==='상'?'#dc2626':h.risk==='중'?'#d97706':'#16a34a';
+        const riskBg=h.risk==='상'?'#fef2f2':h.risk==='중'?'#fffbeb':'#f0fdf4';
+        const riskAfterColor=h.riskAfter==='상'?'#dc2626':h.riskAfter==='중'?'#d97706':'#16a34a';
+        const riskAfterBg=h.riskAfter==='상'?'#fef2f2':h.riskAfter==='중'?'#fffbeb':'#f0fdf4';
+        return `<tr style="background:${i%2===0?'#f8fdfc':'#ffffff'}">
+          <td style="padding:7px 10px;border-bottom:1px solid #e0f0ec;font-weight:600;color:#1e8f76;width:110px;vertical-align:top">${h.icon} ${h.label}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #e0f0ec;vertical-align:top;width:120px;font-size:12px;color:#4a6860">${h.workContent||'-'}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #e0f0ec;text-align:center;vertical-align:top;width:44px">
+            <span style="background:${riskBg};color:${riskColor};font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;border:1px solid ${riskColor}">${h.risk}</span>
+          </td>
+          <td style="padding:7px 10px;border-bottom:1px solid #e0f0ec;font-size:12px;vertical-align:top">${h.action||'-'}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #e0f0ec;text-align:center;vertical-align:top;width:44px">
+            <span style="background:${riskAfterBg};color:${riskAfterColor};font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;border:1px solid ${riskAfterColor}">${h.riskAfter}</span>
+          </td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" style="padding:10px;color:#8aada8;text-align:center">-</td></tr>`;
+
+  const wrap=document.createElement('div');
+  wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#1a2b28;padding:0;margin:0;`;
+
+  wrap.innerHTML=`<div style="background:#fff;width:794px;padding:0;margin:0;box-sizing:border-box">
+    <div style="background:linear-gradient(135deg,#2aab8e,#1e8f76);padding:28px 40px 24px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-20px;top:-20px;width:160px;height:160px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;position:relative">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:3px;margin-bottom:6px">ETS SAFETY MANAGEMENT</div>
+          <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1.1">TBM 안전점검조회</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:6px">Tool Box Meeting · 작업 전 안전점검 보고서</div>
+        </div>
+        <div style="text-align:right">
+          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 16px">
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:3px">작업일자</div>
+            <div style="font-size:16px;font-weight:700;color:#fff">${d.workDate||'-'}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:5px">TBM 진행시간</div>
+            <div style="font-size:14px;font-weight:700;color:#fff">⏱ ${d.tbmDuration}분</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:20px 40px 0">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:#f0f4f3;border-radius:10px;padding:12px 14px;border-left:3px solid #2aab8e">
+          <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:4px">작성자</div>
+          <div style="font-size:15px;font-weight:700;color:#1a2b28">${d.author||'-'}</div>
+        </div>
+        <div style="background:#f0f4f3;border-radius:10px;padding:12px 14px;border-left:3px solid #2aab8e">
+          <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:4px">작업장소</div>
+          <div style="font-size:15px;font-weight:700;color:#1a2b28">${d.workPlace||'-'}</div>
+        </div>
+        <div style="background:#f0f4f3;border-radius:10px;padding:12px 14px;border-left:3px solid #2aab8e">
+          <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:4px">참석 인원</div>
+          <div style="font-size:15px;font-weight:700;color:#1a2b28">${d.members.length}명</div>
+        </div>
+      </div>
+      <div style="background:#f0f4f3;border-radius:10px;padding:14px 16px;margin-bottom:16px;border-left:4px solid #2aab8e">
+        <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:6px">프로젝트명</div>
+        <div style="font-size:16px;font-weight:700;color:#1a2b28;margin-bottom:${d.workContent?'10px':'0'}">${d.projName||'-'}</div>
+        ${d.workContent?`<div style="font-size:12px;color:#4a6860;line-height:1.7;border-top:1px solid #d4e6e1;padding-top:8px">${d.workContent}</div>`:''}
+      </div>
+      ${d.members.length?`<div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:3px;height:16px;background:linear-gradient(#2aab8e,#1e8f76);border-radius:2px"></div>
+          <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 명단</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${d.members.map(m=>`<span style="background:#e8f7f4;color:#1e8f76;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid #b2e4d8">${m}</span>`).join('')}
+        </div>
+      </div>`:''}
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="width:3px;height:16px;background:linear-gradient(#e05252,#c84343);border-radius:2px"></div>
+          <div style="font-size:12px;font-weight:700;color:#1a2b28">작업 전 위험성평가</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #d4e6e1">
+          <thead>
+            <tr style="background:linear-gradient(135deg,#2aab8e,#1e8f76)">
+              <th style="padding:10px;text-align:left;color:#fff;font-size:11px;font-weight:700;width:110px">위험요소</th>
+              <th style="padding:10px;text-align:left;color:#fff;font-size:11px;font-weight:700;width:120px">작업 내용</th>
+              <th style="padding:10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:44px">전</th>
+              <th style="padding:10px;text-align:left;color:#fff;font-size:11px;font-weight:700">안전조치 내용</th>
+              <th style="padding:10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:44px">후</th>
+            </tr>
+          </thead>
+          <tbody>${safetyRows}</tbody>
+        </table>
+      </div>
+      ${photoCount>0?`<div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="width:3px;height:16px;background:linear-gradient(#f59e0b,#d97706);border-radius:2px"></div>
+          <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 사진</div>
+        </div>
+        <div style="display:flex;gap:8px">${photoImgTags}</div>
+      </div>`:''}
+      <div style="margin:16px 0 0;padding:14px 20px;background:linear-gradient(135deg,#f0f4f3,#e8f7f4);border-radius:10px;border-top:3px solid #2aab8e;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;color:#8aada8;margin-bottom:2px">작성자 서명</div>
+          <div style="font-size:14px;font-weight:700;color:#1a2b28">${d.author||'-'}</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#8aada8;margin-bottom:2px">본 보고서는 작업 전 안전교육 완료 확인서입니다</div>
+          <div style="font-size:11px;color:#2aab8e;font-weight:700">산업안전보건법 제29조에 의거 작성</div>
+          <div style="font-size:11px;color:#f59e0b;font-weight:700;margin-top:4px">💬 카카오톡 단톡방 공유 완료됨.</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:#8aada8;margin-bottom:2px">안전보건관리책임자</div>
+          <div style="width:80px;height:1px;background:#d4e6e1;margin-top:18px"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.body.appendChild(wrap);
+  await document.fonts.ready;
+  await new Promise(r=>setTimeout(r,300));
+
+  const canvas=await html2canvas(wrap,{
+    scale:2,
+    useCORS:true,
+    allowTaint:true,
+    backgroundColor:'#ffffff',
+    logging:false,
+    width:794,
+    windowWidth:794,
+    height:wrap.scrollHeight,
+    windowHeight:wrap.scrollHeight,
+  });
+
+  document.body.removeChild(wrap);
+  return canvas;
 }
 
 function openPdfPreview(blob){
@@ -1187,13 +1349,13 @@ async function sharePDF(file,d){
 
 async function previewPDF(){
   const d=collect();
-  toast('PDF 생성 중...','ok');
+  toast('이미지 생성 중...','ok');
   try{
-    const{blob}=await makePdfFile(d);
+    const{blob}=await makeImageFile(d);
     openPdfPreview(blob);
   }catch(e){
     console.error(e);
-    toast('PDF 생성 오류','ng');
+    toast('이미지 생성 오류','ng');
   }
 }
 
@@ -1204,13 +1366,10 @@ async function submitForm(){
   const bn=document.getElementById('bNext');
   const sp=document.getElementById('spin');
   const nt=document.getElementById('nTxt');
-  bn.disabled=true;sp.style.display='block';nt.textContent='PDF 생성 중...';
+  bn.disabled=true;sp.style.display='block';nt.textContent='이미지 생성 중...';
 
   try{
-    const{blob,file,fileName}=await makePdfFile(d);
-
-    // 자동 다운로드
-    downloadBlob(blob,fileName);
+    const{blob,file,fileName}=await makeImageFile(d);
 
     // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
@@ -1223,38 +1382,45 @@ async function submitForm(){
       if(el) el.remove();
     });
 
-    document.getElementById('doneMsg').innerHTML=`
-      <strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다!<br>
-      <span style="font-size:13px;color:#8aada8">PDF가 다운로드 폴더에 저장됐어요</span>
-    `;
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      // 공유 가능 — 바로 공유창 열기
+      document.getElementById('doneMsg').innerHTML=
+        `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>아래 버튼으로 카카오톡에 공유하세요.`;
 
-    // 카카오톡 열기 버튼 (앱 직접 실행)
-    const kakaoBtn=document.createElement('button');
-    kakaoBtn.id='kakaoOpenBtn';
-    kakaoBtn.innerHTML='💬 카카오톡 열기';
-    kakaoBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:8px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
-    kakaoBtn.onclick=()=>{
-      const ua=navigator.userAgent.toLowerCase();
-      if(ua.indexOf('android')>-1){
-        // 안드로이드: 인텐트 방식
-        window.location.href='intent:#Intent;package=com.kakao.talk;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
-      } else {
-        // 아이폰
-        window.location.href='kakaotalk://';
-      }
-    };
-    doneSection.insertBefore(kakaoBtn,doneSection.querySelector('.btn-new'));
+      const shareBtn=document.createElement('button');
+      shareBtn.id='kakaoShareBtn';
+      shareBtn.innerHTML='💬 카카오톡으로 공유하기';
+      shareBtn.style.cssText=`background:#FEE500;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;color:#3C1E1E;margin-bottom:12px;width:100%;max-width:300px;box-shadow:0 4px 14px rgba(254,229,0,.4);`;
+      shareBtn.onclick=async()=>{
+        try{
+          await navigator.share({
+            title:`[TBM] ${d.projName||'안전점검조회'}`,
+            text:`${d.workDate} ${d.workPlace} / 작성자: ${d.author}`,
+            files:[file]
+          });
+        }catch(e){
+          if(e.name!=='AbortError'){
+            downloadBlob(blob,fileName);
+            toast('갤러리에서 카카오톡으로 보내주세요.','ok');
+          }
+        }
+      };
+      doneSection.insertBefore(shareBtn,doneSection.querySelector('.btn-new'));
 
-    // 안내 문구
-    const guide=document.createElement('div');
-    guide.style.cssText=`font-size:12px;color:#8aada8;line-height:1.9;margin-bottom:16px;text-align:left;width:100%;max-width:300px;background:#f0f4f3;border-radius:10px;padding:12px 14px;`;
-    guide.innerHTML=`
-      <strong style="color:#4a6860">📌 전송 방법</strong><br>
-      ① 위 버튼으로 카카오톡 열기<br>
-      ② 단톡방 → <strong style="color:#1a2b28">+ 버튼</strong> → <strong style="color:#1a2b28">파일</strong><br>
-      ③ 다운로드 폴더에서 PDF 선택 → 전송
-    `;
-    doneSection.insertBefore(guide,doneSection.querySelector('.btn-new'));
+    }else{
+      // 다운로드 후 갤러리에서 공유 안내
+      downloadBlob(blob,fileName);
+      document.getElementById('doneMsg').innerHTML=
+        `<strong>${esc(d.author)}</strong>님의 TBM이 완료됐습니다.<br>
+        <span style="font-size:13px;color:#8aada8">이미지가 저장됐어요 — 갤러리에서 카카오톡으로 공유하세요</span>`;
+
+      const dlBtn=document.createElement('button');
+      dlBtn.id='kakaoDownBtn';
+      dlBtn.innerHTML='🖼 이미지 다시 저장';
+      dlBtn.style.cssText=`background:#2aab8e;border:none;border-radius:13px;padding:16px 36px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:12px;width:100%;max-width:300px;`;
+      dlBtn.onclick=()=>downloadBlob(blob,fileName);
+      doneSection.insertBefore(dlBtn,doneSection.querySelector('.btn-new'));
+    }
 
   }catch(e){
     console.error(e);
@@ -1263,7 +1429,7 @@ async function submitForm(){
     document.getElementById('navBar').style.display='flex';
     document.getElementById('doneScreen').classList.remove('show');
   }finally{
-    bn.disabled=false;sp.style.display='none';nt.textContent='📄 PDF 생성 및 공유';
+    bn.disabled=false;sp.style.display='none';nt.textContent='🖼 이미지 생성 및 공유';
   }
 }
 
