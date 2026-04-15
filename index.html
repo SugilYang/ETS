@@ -214,17 +214,17 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 .photo-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .photo-label .badge{background:var(--teal-l);color:var(--teal2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
 .pslot{
-  aspect-ratio:4/3;border-radius:11px;border:2px dashed var(--border);background:var(--bg);
+  border-radius:11px;border:2px dashed var(--border);background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   cursor:pointer;position:relative;overflow:hidden;transition:border-color .2s,background .2s;
-  margin-bottom:10px;
+  margin-bottom:10px;min-height:80px;
 }
 .pslot:hover{border-color:var(--teal);background:var(--teal-l)}
 .pslot input[type=file]{display:none}
 .pslot .pi{font-size:28px;color:var(--text3);margin-bottom:5px}
 .pslot .pt{font-size:12px;color:var(--text2);font-weight:600}
 .pslot .ps{font-size:11px;color:var(--text3);margin-top:2px}
-.pslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:9px;background:#f0f4f3}
+.pslot img{width:100%;height:auto;display:block;border-radius:9px}
 .pslot .prm{
   position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;
   border:none;border-radius:50%;width:26px;height:26px;font-size:15px;
@@ -233,7 +233,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 .pslot.has .prm{display:flex}.pslot.has .pi,.pslot.has .pt,.pslot.has .ps{display:none}
 .pslot-main{width:100%}
 .pslot-sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.pslot-sub{aspect-ratio:4/3}
+.pslot-sub{}
 
 /* 요약 */
 .sum-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
@@ -359,6 +359,16 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
   <!-- STEP 1 기본정보 -->
   <div class="step active" id="s0">
     <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">STEP 1 / 6</div><div class="h-ttl">기본 정보</div></div></div>
+    <!-- TBM 운영 가이드 -->
+    <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;border-radius:13px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px">📌 TBM 운영 가이드</div>
+      <div style="font-size:12px;color:#78350f;line-height:1.85">
+        <div>① <b>작업 전</b> — STEP 1~4 기본정보·위험요소·안전조치 미리 작성</div>
+        <div>② <b>현장 집합</b> — 작성 내용 보며 팀원에게 구두 교육</div>
+        <div>③ <b>교육 후</b> — 참석자 사진 촬영 및 서명지 사진 촬영</div>
+        <div>④ <b>제출</b> — 카카오톡 단톡방으로 보고서 공유</div>
+      </div>
+    </div>
     <div class="card">
       <div class="row2" style="margin-bottom:15px">
         <div class="fld" style="margin-bottom:0">
@@ -456,21 +466,28 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
       <div class="photo-section">
         <div class="photo-label">참석자 식별이 가능하도록 사진 촬영 必 인원이 많을 경우 최대 3장으로 나누어 촬영 필요. <span class="badge">최대 3장</span></div>
         <div class="pslot pslot-main" id="ps0" onclick="trigPh(0)">
-          <input type="file" accept="image/*" capture="user" id="pf0" onchange="loadPh(0,this)">
-          <span class="pi">📸</span><span class="pt">참석자 사진 1</span><span class="ps">전원 얼굴이 나오도록 촬영</span>
+          <input type="file" accept="image/*" id="pf0" onchange="loadPh(0,this)">
+          <span class="pi">📸</span><span class="pt">참석자 사진 1</span><span class="ps">탭하여 촬영 또는 갤러리 선택</span>
           <button class="prm" onclick="rmPh(event,0)">×</button>
+        </div>
+        <div style="display:none" id="sv0">
+          <button onclick="savePh(0)" style="width:100%;margin-bottom:10px;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📥 사진 1 갤러리에 저장</button>
         </div>
         <div class="pslot-sub-grid">
           <div class="pslot pslot-sub" id="ps1" onclick="trigPh(1)">
-            <input type="file" accept="image/*" capture="user" id="pf1" onchange="loadPh(1,this)">
+            <input type="file" accept="image/*" id="pf1" onchange="loadPh(1,this)">
             <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">참석자 사진 2</span>
             <button class="prm" onclick="rmPh(event,1)">×</button>
           </div>
           <div class="pslot pslot-sub" id="ps2" onclick="trigPh(2)">
-            <input type="file" accept="image/*" capture="user" id="pf2" onchange="loadPh(2,this)">
+            <input type="file" accept="image/*" id="pf2" onchange="loadPh(2,this)">
             <span class="pi" style="font-size:20px">✍️</span><span class="pt" style="font-size:11px">참석자 서명지 사진</span>
             <button class="prm" onclick="rmPh(event,2)">×</button>
           </div>
+        </div>
+        <div id="sv12wrap" style="display:none;gap:8px;margin-top:2px">
+          <button id="sv1" onclick="savePh(1)" style="display:none;flex:1;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📥 사진 2 저장</button>
+          <button id="sv2" onclick="savePh(2)" style="display:none;flex:1;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📥 서명지 저장</button>
         </div>
       </div>
     </div>
@@ -903,6 +920,14 @@ function loadPh(i,inp){
     if(!img){img=document.createElement('img');slot.appendChild(img);}
     img.src=e.target.result;
     slot.classList.add('has');
+    // 저장 버튼 표시
+    if(i===0){document.getElementById('sv0').style.display='block';}
+    else{
+      const sv=document.getElementById('sv'+i);
+      if(sv){sv.style.display='flex';}
+      const wrap=document.getElementById('sv12wrap');
+      if(wrap){wrap.style.display='flex';}
+    }
   };
   r.readAsDataURL(inp.files[0]);
 }
@@ -913,6 +938,23 @@ function rmPh(ev,i){
   const img=s.querySelector('img');if(img)img.remove();
   s.classList.remove('has');
   document.getElementById('pf'+i).value='';
+  // 저장 버튼 숨김
+  if(i===0){document.getElementById('sv0').style.display='none';}
+  else{
+    const sv=document.getElementById('sv'+i);
+    if(sv){sv.style.display='none';}
+    if(!photos[1]&&!photos[2]){const wrap=document.getElementById('sv12wrap');if(wrap)wrap.style.display='none';}
+  }
+}
+
+// 사진 갤러리 저장
+function savePh(i){
+  if(!photos[i]){toast('저장할 사진이 없습니다','ng');return;}
+  const a=document.createElement('a');
+  a.href=photos[i];
+  a.download=`TBM_사진${i+1}_${new Date().toISOString().slice(0,10)}.jpg`;
+  document.body.appendChild(a);a.click();a.remove();
+  toast('📥 사진이 저장됐습니다','ok');
 }
 
 function esc(v){
@@ -987,13 +1029,21 @@ async function buildPDFCanvas(d){
   const validPhotos=photos.filter(Boolean);
   const photoCount=validPhotos.length;
 
-  // 사진을 Base64로 준비
-  const photoImgTags=validPhotos.map((src,idx)=>`
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px">
-      <div style="font-size:9px;font-weight:700;color:#8aada8;text-align:center">${idx===2?'참석자 서명지':('참석자 사진 '+(idx+1))}</div>
-      <img src="${src}" style="width:100%;max-height:180px;object-fit:contain;border-radius:8px;border:2px solid #d4e6e1;background:#f8f8f8">
-    </div>
-  `).join('');
+  // 사진 레이아웃: 1개→반칸, 2개→한줄2개, 3개→윗줄2+아랫줄1
+  function makePhotoGrid(photos){
+    const labels=['참석자 사진 1','참석자 사진 2','참석자 서명지'];
+    const card=(src,idx)=>`
+      <div style="width:calc(50% - 5px);display:inline-block;vertical-align:top;margin-bottom:8px">
+        <div style="font-size:9px;font-weight:700;color:#8aada8;margin-bottom:3px;text-align:center">${labels[idx]||('사진'+(idx+1))}</div>
+        <img src="${src}" style="width:100%;height:auto;border-radius:8px;border:2px solid #d4e6e1;display:block">
+      </div>`;
+    if(photos.length===1) return `<div style="width:100%"><div style="display:flex;gap:10px">${card(photos[0],0)}</div></div>`;
+    if(photos.length===2) return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
+    // 3개
+    return `<div style="display:flex;gap:10px;margin-bottom:0">${card(photos[0],0)}${card(photos[1],1)}</div>
+            <div style="display:flex;gap:10px">${card(photos[2],2)}</div>`;
+  }
+  const photoImgTags=makePhotoGrid(validPhotos);
 
   // 안전조치 행 생성
   const safetyRows=d.hazardSafety.length
@@ -1139,9 +1189,7 @@ async function buildPDFCanvas(d){
           <div style="width:3px;height:13px;background:linear-gradient(#f59e0b,#d97706);border-radius:2px"></div>
           <div style="font-size:10px;font-weight:800;color:#1a2b28;letter-spacing:.5px">참석자 사진</div>
         </div>
-        <div style="display:flex;gap:10px">
-          ${validPhotos.map(src=>`<img src="${src}" style="flex:1;min-width:0;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:2px solid #d4e6e1;box-shadow:0 2px 8px rgba(0,0,0,.1)">`).join('')}
-        </div>
+        ${photoImgTags}
       </div>`:''}
 
     </div>
@@ -1241,12 +1289,19 @@ async function makeImageFile(d){
 async function buildImageCanvas(d){
   const validPhotos=photos.filter(Boolean);
   const photoCount=validPhotos.length;
-  const photoImgTags=validPhotos.map((src,idx)=>`
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px">
-      <div style="font-size:10px;font-weight:700;color:#8aada8;text-align:center">${idx===2?'참석자 서명지':('참석자 사진 '+(idx+1))}</div>
-      <img src="${src}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:2px solid #d4e6e1;background:#f8f8f8">
-    </div>
-  `).join('');
+  function makePhotoGrid(photos){
+    const labels=['참석자 사진 1','참석자 사진 2','참석자 서명지'];
+    const card=(src,idx)=>`
+      <div style="width:calc(50% - 5px);display:inline-block;vertical-align:top;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;color:#8aada8;margin-bottom:3px;text-align:center">${labels[idx]||('사진'+(idx+1))}</div>
+        <img src="${src}" style="width:100%;height:auto;border-radius:8px;border:2px solid #d4e6e1;display:block">
+      </div>`;
+    if(photos.length===1) return `<div style="display:flex;gap:10px">${card(photos[0],0)}</div>`;
+    if(photos.length===2) return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
+    return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>
+            <div style="display:flex;gap:10px">${card(photos[2],2)}</div>`;
+  }
+  const photoImgTags=makePhotoGrid(validPhotos);
 
   const safetyRows=d.hazardSafety.length
     ? d.hazardSafety.map((h,i)=>{
@@ -1342,7 +1397,7 @@ async function buildImageCanvas(d){
           <div style="width:3px;height:16px;background:linear-gradient(#f59e0b,#d97706);border-radius:2px"></div>
           <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 사진</div>
         </div>
-        <div style="display:flex;gap:8px">${photoImgTags}</div>
+        ${photoImgTags}
       </div>`:''}
       <div style="margin:16px 0 0;padding:14px 20px;background:linear-gradient(135deg,#f0f4f3,#e8f7f4);border-radius:10px;border-top:3px solid #2aab8e;display:flex;justify-content:space-between;align-items:center">
         <div>
