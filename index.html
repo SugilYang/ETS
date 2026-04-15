@@ -284,19 +284,6 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 .spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:sp .7s linear infinite;display:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(max-width:400px){.row2{grid-template-columns:1fr}}
-
-/* 서명 */
-.sig-member-block{margin-bottom:18px;background:var(--bg);border-radius:12px;overflow:hidden;border:1.5px solid var(--border)}
-.sig-member-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--teal-l);border-bottom:1px solid var(--teal-m)}
-.sig-member-name{font-size:14px;font-weight:700;color:var(--teal2)}
-.sig-status{font-size:11px;font-weight:600;color:var(--text3)}
-.sig-status.done{color:var(--success)}
-.sig-canvas-wrap{position:relative;background:#fff;border-bottom:1px solid var(--border)}
-.sig-canvas{width:100%;display:block;touch-action:none;cursor:crosshair}
-.sig-actions{display:flex;gap:8px;padding:8px 12px;background:#fafafa}
-.sig-clear{flex:1;padding:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer}
-.sig-done{flex:2;padding:8px;background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;border-radius:9px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
-.sig-preview{width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:8px;border:1.5px solid var(--teal-m);display:none;padding:4px}
 </style>
 </head>
 <body>
@@ -357,15 +344,13 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
     <span class="slbl" id="lb2">위험성평가</span>
     <span class="slbl" id="lb3">안전조치</span>
     <span class="slbl" id="lb4">사진·비고</span>
-    <span class="slbl" id="lb5">서명</span>
-    <span class="slbl" id="lb6">제출</span>
+    <span class="slbl" id="lb5">제출</span>
   </div>
-  <div class="prog-track"><div class="prog-bar" id="pBar" style="width:5%"></div></div>
+  <div class="prog-track"><div class="prog-bar" id="pBar" style="width:7%"></div></div>
   <div class="dots">
     <div class="dot on" id="d0"></div><div class="dot" id="d1"></div>
     <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
     <div class="dot" id="d4"></div><div class="dot" id="d5"></div>
-    <div class="dot" id="d6"></div>
   </div>
 </div>
 
@@ -373,16 +358,15 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
   <!-- STEP 1 기본정보 -->
   <div class="step active" id="s0">
-    <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">STEP 1 / 7</div><div class="h-ttl">기본 정보</div></div></div>
+    <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">STEP 1 / 6</div><div class="h-ttl">기본 정보</div></div></div>
     <!-- TBM 운영 가이드 -->
     <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;border-radius:13px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px">📌 TBM 운영 가이드</div>
       <div style="font-size:12px;color:#78350f;line-height:1.85">
-        <div>① <b>작업 전</b> — STEP 1~4 기본정보·위험요소·안전조치 미리 작성</div>
+        <div>① <b>시작 전</b> — STEP 1~4 안전조치까지 미리 작성</div>
         <div>② <b>현장 집합</b> — 작성 내용 보며 팀원에게 구두 교육</div>
-        <div>③ <b>교육 후</b> — 참석자 사진 촬영</div>
-        <div>④ <b>서명</b> — 스마트폰 순서대로 돌려 각자 손글씨 서명</div>
-        <div>⑤ <b>제출</b> — 카카오톡 단톡방으로 보고서 공유</div>
+        <div>③ <b>교육 후</b> — 참석자 사진 촬영 및 서명지 사진 촬영</div>
+        <div>④ <b>제출</b> — 카카오톡 단톡방으로 보고서 공유</div>
       </div>
     </div>
     <div class="card">
@@ -477,25 +461,33 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
   <!-- STEP 5 사진·비고 -->
   <div class="step" id="s4">
-    <div class="hero"><div class="h-icon">📸</div><div><div class="h-num">STEP 5 / 7</div><div class="h-ttl">참석자 사진 · 특이사항</div></div></div>
+    <div class="hero"><div class="h-icon">📸</div><div><div class="h-num">STEP 5 / 6</div><div class="h-ttl">참석자 사진 · 특이사항</div></div></div>
     <div class="card">
       <div class="photo-section">
-        <div class="photo-label">참석자 식별이 가능하도록 사진 촬영 必 <span class="badge">최대 2장</span></div>
+        <div class="photo-label">참석자 식별이 가능하도록 사진 촬영 必 인원이 많을 경우 최대 2장으로 나누어 촬영 필요. <span class="badge">서명지사진必</span></div>
+        <div class="pslot pslot-main" id="ps0" onclick="trigPh(0)">
+          <input type="file" accept="image/*" id="pf0" onchange="loadPh(0,this)">
+          <span class="pi">📸</span><span class="pt">참석자 사진 1</span><span class="ps">탭하여 촬영 또는 갤러리 선택</span>
+          <button class="prm" onclick="rmPh(event,0)">×</button>
+        </div>
+        <div style="display:none" id="sv0">
+          <button onclick="savePh(0)" style="width:100%;margin-bottom:10px;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📥 사진 1 갤러리에 저장</button>
+        </div>
         <div class="pslot-sub-grid">
-          <div class="pslot pslot-sub" id="ps0" onclick="trigPh(0)">
-            <input type="file" accept="image/*" id="pf0" onchange="loadPh(0,this)">
-            <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">참석자 사진 1</span>
-            <button class="prm" onclick="rmPh(event,0)">×</button>
-          </div>
           <div class="pslot pslot-sub" id="ps1" onclick="trigPh(1)">
             <input type="file" accept="image/*" id="pf1" onchange="loadPh(1,this)">
             <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">참석자 사진 2</span>
             <button class="prm" onclick="rmPh(event,1)">×</button>
           </div>
+          <div class="pslot pslot-sub" id="ps2" onclick="trigPh(2)">
+            <input type="file" accept="image/*" id="pf2" onchange="loadPh(2,this)">
+            <span class="pi" style="font-size:20px">✍️</span><span class="pt" style="font-size:11px">참석자 서명지 사진</span>
+            <button class="prm" onclick="rmPh(event,2)">×</button>
+          </div>
         </div>
-        <div id="sv12wrap" style="display:none;gap:8px;margin-top:6px">
-          <button id="sv0" onclick="savePh(0)" style="display:none;flex:1;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📥 사진 1 저장</button>
+        <div id="sv12wrap" style="display:none;gap:8px;margin-top:2px">
           <button id="sv1" onclick="savePh(1)" style="display:none;flex:1;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📥 사진 2 저장</button>
+          <button id="sv2" onclick="savePh(2)" style="display:none;flex:1;padding:9px;background:#f0faf8;border:1.5px solid #2aab8e;border-radius:10px;color:#1e8f76;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📥 서명지 저장</button>
         </div>
       </div>
     </div>
@@ -520,21 +512,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
     </div>
   </div>
 
-  <!-- STEP 6 참석자 서명 -->
+  <!-- STEP 6 최종확인 -->
   <div class="step" id="s5">
-    <div class="hero"><div class="h-icon">✍️</div><div><div class="h-num">STEP 6 / 7</div><div class="h-ttl">참석자 서명</div></div></div>
-    <div class="card">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-        📱 스마트폰을 순서대로 전달하여 각 참석자가 직접 서명해 주세요.<br>
-        <span style="font-size:12px;color:var(--text3)">서명은 최종 보고서에 포함됩니다.</span>
-      </div>
-      <div id="sigList"></div>
-    </div>
-  </div>
-
-  <!-- STEP 7 최종확인 -->
-  <div class="step" id="s6">
-    <div class="hero"><div class="h-icon">✅</div><div><div class="h-num">STEP 7 / 7</div><div class="h-ttl">최종 확인 · 제출</div></div></div>
+    <div class="hero"><div class="h-icon">✅</div><div><div class="h-num">STEP 6 / 6</div><div class="h-ttl">최종 확인 · 제출</div></div></div>
     <div class="card" id="sumCard"></div>
   </div>
 
@@ -643,10 +623,9 @@ function skipNotice(){
 }
 
 // ══════════════════════════════════════════════════════════
-const TOTAL=7;
+const TOTAL=6;
 let cur=0;
-const photos=[null,null];
-const signatures={};  // {이름: dataURL}
+const photos=[null,null,null];
 // TBM 진행시간: 15~20분 랜덤
 const TBM_DURATION = Math.floor(Math.random()*6)+15; // 15,16,17,18,19,20 중 하나
 let incidentStatus='none'; // 환자발생 여부
@@ -656,7 +635,7 @@ const koreaDate = new Date(today.getTime() + (9 * 60 * 60 * 1000));
 document.getElementById('workDate').value = koreaDate.toISOString().slice(0, 10);
 
 function updProg(n){
-  const pct=[5,20,35,52,67,80,93];
+  const pct=[7,24,42,58,74,92];
   document.getElementById('pBar').style.width=pct[n]+'%';
   for(let i=0;i<TOTAL;i++){
     document.getElementById('lb'+i).className='slbl'+(i<n?' done':i===n?' on':'');
@@ -675,7 +654,6 @@ function go(dir){
   const pg=pages[cur];
   pg.className='step active'+(dir<0?' back':'');
   if(cur===3)buildSafetyInputs();
-  if(cur===5)buildSignatureStep();
   setTimeout(()=>pg.classList.remove('back'),350);
   updProg(cur);
   if(cur===TOTAL-1)buildSum();
@@ -925,10 +903,9 @@ function collect(){
     hazards,
     hazardSafety,
     safetyExtra,
-    incidentStatus,
-    incidentPerson,
+    incidentStatus,   // 'none' | 'yes'
+    incidentPerson,   // 대상자 텍스트
     tbmDuration: TBM_DURATION,
-    signatures: {...signatures},
   };
 }
 
@@ -944,10 +921,13 @@ function loadPh(i,inp){
     img.src=e.target.result;
     slot.classList.add('has');
     // 저장 버튼 표시
-    const sv=document.getElementById('sv'+i);
-    if(sv){sv.style.display='flex';}
-    const wrap=document.getElementById('sv12wrap');
-    if(wrap){wrap.style.display='flex';}
+    if(i===0){document.getElementById('sv0').style.display='block';}
+    else{
+      const sv=document.getElementById('sv'+i);
+      if(sv){sv.style.display='flex';}
+      const wrap=document.getElementById('sv12wrap');
+      if(wrap){wrap.style.display='flex';}
+    }
   };
   r.readAsDataURL(inp.files[0]);
 }
@@ -959,11 +939,15 @@ function rmPh(ev,i){
   s.classList.remove('has');
   document.getElementById('pf'+i).value='';
   // 저장 버튼 숨김
-  const sv=document.getElementById('sv'+i);
-  if(sv){sv.style.display='none';}
-  if(!photos[0]&&!photos[1]){const wrap=document.getElementById('sv12wrap');if(wrap)wrap.style.display='none';}
+  if(i===0){document.getElementById('sv0').style.display='none';}
+  else{
+    const sv=document.getElementById('sv'+i);
+    if(sv){sv.style.display='none';}
+    if(!photos[1]&&!photos[2]){const wrap=document.getElementById('sv12wrap');if(wrap)wrap.style.display='none';}
+  }
 }
 
+// 사진 갤러리 저장
 function savePh(i){
   if(!photos[i]){toast('저장할 사진이 없습니다','ng');return;}
   const a=document.createElement('a');
@@ -1053,9 +1037,10 @@ async function buildPDFCanvas(d){
         <div style="font-size:9px;font-weight:700;color:#8aada8;margin-bottom:3px;text-align:center">${labels[idx]||('사진'+(idx+1))}</div>
         <img src="${src}" style="width:100%;height:auto;border-radius:8px;border:2px solid #d4e6e1;display:block">
       </div>`;
-    if(photos.length===1) return `<div style="display:flex;gap:10px">${card(photos[0],0)}</div>`;
+    if(photos.length===1) return `<div style="width:100%"><div style="display:flex;gap:10px">${card(photos[0],0)}</div></div>`;
     if(photos.length===2) return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
-    return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>
+    // 3개
+    return `<div style="display:flex;gap:10px;margin-bottom:0">${card(photos[0],0)}${card(photos[1],1)}</div>
             <div style="display:flex;gap:10px">${card(photos[2],2)}</div>`;
   }
   const photoImgTags=makePhotoGrid(validPhotos);
@@ -1305,27 +1290,18 @@ async function buildImageCanvas(d){
   const validPhotos=photos.filter(Boolean);
   const photoCount=validPhotos.length;
   function makePhotoGrid(photos){
-    const labels=['참석자 사진 1','참석자 사진 2'];
+    const labels=['참석자 사진 1','참석자 사진 2','참석자 서명지'];
     const card=(src,idx)=>`
       <div style="width:calc(50% - 5px);display:inline-block;vertical-align:top;margin-bottom:8px">
         <div style="font-size:10px;font-weight:700;color:#8aada8;margin-bottom:3px;text-align:center">${labels[idx]||('사진'+(idx+1))}</div>
         <img src="${src}" style="width:100%;height:auto;border-radius:8px;border:2px solid #d4e6e1;display:block">
       </div>`;
     if(photos.length===1) return `<div style="display:flex;gap:10px">${card(photos[0],0)}</div>`;
-    return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
+    if(photos.length===2) return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
+    return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>
+            <div style="display:flex;gap:10px">${card(photos[2],2)}</div>`;
   }
   const photoImgTags=makePhotoGrid(validPhotos);
-
-  // 서명 HTML 생성
-  const sigEntries=d.members.map(m=>{
-    const sigData=d.signatures&&d.signatures[m];
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:80px;max-width:120px">
-      <div style="font-size:11px;font-weight:700;color:#1e8f76;text-align:center">${esc(m)}</div>
-      <div style="width:100%;height:56px;border-bottom:1.5px solid #b2e4d8;display:flex;align-items:flex-end;justify-content:center;background:#fafcfb;border-radius:6px;overflow:hidden">
-        ${sigData?`<img src="${sigData}" style="width:100%;height:56px;object-fit:contain">`:''}
-      </div>
-    </div>`;
-  }).join('');
 
   const safetyRows=d.hazardSafety.length
     ? d.hazardSafety.map((h,i)=>{
@@ -1386,8 +1362,8 @@ async function buildImageCanvas(d){
       </div>
       <div style="background:#f0f4f3;border-radius:10px;padding:14px 16px;margin-bottom:16px;border-left:4px solid #2aab8e">
         <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:6px">프로젝트명 / 작업내용</div>
-        <div style="font-size:16px;font-weight:700;color:#1a2b28;margin-bottom:${d.workContent?'10px':'0'}">${d.projName||'-'}</div>
-        ${d.workContent?`<div style="font-size:12px;color:#4a6860;line-height:1.7;border-top:1px solid #d4e6e1;padding-top:8px">📋 ${esc(d.workContent)}</div>`:''}
+        <div style="font-size:16px;font-weight:700;color:#1a2b28;margin-bottom:10px">${esc(d.projName)||'-'}</div>
+        <div style="font-size:12px;color:#4a6860;line-height:1.7;border-top:1px solid #d4e6e1;padding-top:8px">📋 작업내용: ${esc(d.workContent)||'(미입력)'}</div>
       </div>
       ${d.members.length?`<div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -1395,7 +1371,7 @@ async function buildImageCanvas(d){
           <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 명단</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${d.members.map(m=>`<span style="background:#e8f7f4;color:#1e8f76;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid #b2e4d8">${esc(m)}</span>`).join('')}
+          ${d.members.map(m=>`<span style="background:#e8f7f4;color:#1e8f76;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid #b2e4d8">${m}</span>`).join('')}
         </div>
       </div>`:''}
       <div style="margin-bottom:16px">
@@ -1422,17 +1398,6 @@ async function buildImageCanvas(d){
           <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 사진</div>
         </div>
         ${photoImgTags}
-      </div>`:''}
-      ${d.members.length?`<div style="margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="width:3px;height:16px;background:linear-gradient(#7c3aed,#6d28d9);border-radius:2px"></div>
-          <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 서명</div>
-        </div>
-        <div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:14px 16px">
-          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start">
-            ${sigEntries}
-          </div>
-        </div>
       </div>`:''}
       <div style="margin:16px 0 0;padding:14px 20px;background:linear-gradient(135deg,#f0f4f3,#e8f7f4);border-radius:10px;border-top:3px solid #2aab8e;display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -1586,103 +1551,6 @@ async function submitForm(){
 }
 
 function resetAll(){location.reload();}
-
-// ── 서명 스텝 빌드 ──
-function buildSignatureStep(){
-  const raw=document.getElementById('memberBox').value;
-  const members=raw.split(/[\n,，、]+/).map(s=>s.trim()).filter(Boolean);
-  const list=document.getElementById('sigList');
-  list.innerHTML='';
-
-  if(!members.length){
-    list.innerHTML='<div style="text-align:center;color:var(--text3);padding:20px;font-size:14px">참석자가 없습니다. STEP 2로 돌아가 참석자를 입력해주세요.</div>';
-    return;
-  }
-
-  members.forEach(name=>{
-    const block=document.createElement('div');
-    block.className='sig-member-block';
-    block.id='sig_'+name;
-    const alreadySigned=signatures[name];
-    block.innerHTML=`
-      <div class="sig-member-header">
-        <span class="sig-member-name">✍️ ${escV2(name)}</span>
-        <span class="sig-status${alreadySigned?' done':''}" id="sigSt_${escV2(name)}">${alreadySigned?'✅ 서명완료':'서명 대기'}</span>
-      </div>
-      ${alreadySigned
-        ? `<div style="padding:8px 12px"><img class="sig-preview" src="${alreadySigned}" style="display:block;width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:8px;border:1.5px solid var(--teal-m)"></div>
-           <div class="sig-actions"><button class="sig-clear" onclick="resetSig('${escV2(name)}')">다시 서명</button></div>`
-        : `<div class="sig-canvas-wrap">
-             <canvas class="sig-canvas" id="sc_${escV2(name)}" height="160"></canvas>
-           </div>
-           <div class="sig-actions">
-             <button class="sig-clear" onclick="clearSigCanvas('${escV2(name)}')">지우기</button>
-             <button class="sig-done" onclick="saveSig('${escV2(name)}')">✅ 서명 완료</button>
-           </div>`
-      }
-    `;
-    list.appendChild(block);
-    if(!alreadySigned) initSigCanvas(name);
-  });
-}
-
-function escV2(v){return String(v||'').replace(/'/g,"\\'")}
-
-function initSigCanvas(name){
-  setTimeout(()=>{
-    const canvas=document.getElementById('sc_'+name);
-    if(!canvas)return;
-    canvas.width=canvas.offsetWidth||canvas.parentElement.offsetWidth||300;
-    const ctx=canvas.getContext('2d');
-    ctx.strokeStyle='#1a2b28';
-    ctx.lineWidth=2.5;
-    ctx.lineCap='round';
-    ctx.lineJoin='round';
-    let drawing=false, lx=0, ly=0;
-
-    function getPos(e){
-      const r=canvas.getBoundingClientRect();
-      const t=e.touches?e.touches[0]:e;
-      return{x:(t.clientX-r.left)*(canvas.width/r.width), y:(t.clientY-r.top)*(canvas.height/r.height)};
-    }
-    canvas.addEventListener('mousedown',e=>{drawing=true;const p=getPos(e);lx=p.x;ly=p.y;});
-    canvas.addEventListener('mousemove',e=>{if(!drawing)return;const p=getPos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;});
-    canvas.addEventListener('mouseup',()=>drawing=false);
-    canvas.addEventListener('mouseleave',()=>drawing=false);
-    canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=getPos(e);lx=p.x;ly=p.y;},{passive:false});
-    canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=getPos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;},{passive:false});
-    canvas.addEventListener('touchend',()=>drawing=false);
-  },100);
-}
-
-function clearSigCanvas(name){
-  const canvas=document.getElementById('sc_'+name);
-  if(!canvas)return;
-  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-}
-
-function saveSig(name){
-  const canvas=document.getElementById('sc_'+name);
-  if(!canvas)return;
-  // 빈 캔버스 체크
-  const ctx=canvas.getContext('2d');
-  const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
-  const hasContent=data.some((v,i)=>i%4===3&&v>0);
-  if(!hasContent){toast('서명을 해주세요','ng');return;}
-  signatures[name]=canvas.toDataURL('image/png');
-  toast(`${name} 서명 완료!`,'ok');
-  buildSignatureStep(); // 다시 렌더링
-  // 다음 미서명자로 스크롤
-  setTimeout(()=>{
-    const next=document.querySelector('.sig-member-block .sig-canvas-wrap');
-    if(next)next.scrollIntoView({behavior:'smooth',block:'center'});
-  },200);
-}
-
-function resetSig(name){
-  delete signatures[name];
-  buildSignatureStep();
-}
 
 // ── 직접 입력 모드 활성화 ──
 function enableDirectInput(btn){
