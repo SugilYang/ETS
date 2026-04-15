@@ -224,7 +224,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 .pslot .pi{font-size:28px;color:var(--text3);margin-bottom:5px}
 .pslot .pt{font-size:12px;color:var(--text2);font-weight:600}
 .pslot .ps{font-size:11px;color:var(--text3);margin-top:2px}
-.pslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px}
+.pslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:9px;background:#f0f4f3}
 .pslot .prm{
   position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;
   border:none;border-radius:50%;width:26px;height:26px;font-size:15px;
@@ -463,12 +463,12 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         <div class="pslot-sub-grid">
           <div class="pslot pslot-sub" id="ps1" onclick="trigPh(1)">
             <input type="file" accept="image/*" capture="user" id="pf1" onchange="loadPh(1,this)">
-            <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">사진 2</span>
+            <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">참석자 사진 2</span>
             <button class="prm" onclick="rmPh(event,1)">×</button>
           </div>
           <div class="pslot pslot-sub" id="ps2" onclick="trigPh(2)">
             <input type="file" accept="image/*" capture="user" id="pf2" onchange="loadPh(2,this)">
-            <span class="pi" style="font-size:20px">📸</span><span class="pt" style="font-size:11px">사진 3</span>
+            <span class="pi" style="font-size:20px">✍️</span><span class="pt" style="font-size:11px">참석자 서명지 사진</span>
             <button class="prm" onclick="rmPh(event,2)">×</button>
           </div>
         </div>
@@ -988,8 +988,11 @@ async function buildPDFCanvas(d){
   const photoCount=validPhotos.length;
 
   // 사진을 Base64로 준비
-  const photoImgTags=validPhotos.map(src=>`
-    <img src="${src}" style="width:${photoCount===1?'100%':photoCount===2?'calc(50% - 4px)':'calc(33.33% - 6px)'};aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:inline-block;margin:0 2px">
+  const photoImgTags=validPhotos.map((src,idx)=>`
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:9px;font-weight:700;color:#8aada8;text-align:center">${idx===2?'참석자 서명지':('참석자 사진 '+(idx+1))}</div>
+      <img src="${src}" style="width:100%;max-height:180px;object-fit:contain;border-radius:8px;border:2px solid #d4e6e1;background:#f8f8f8">
+    </div>
   `).join('');
 
   // 안전조치 행 생성
@@ -1238,8 +1241,11 @@ async function makeImageFile(d){
 async function buildImageCanvas(d){
   const validPhotos=photos.filter(Boolean);
   const photoCount=validPhotos.length;
-  const photoImgTags=validPhotos.map(src=>`
-    <img src="${src}" style="width:${photoCount===1?'100%':photoCount===2?'calc(50% - 4px)':'calc(33.33% - 6px)'};aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:inline-block;margin:0 2px">
+  const photoImgTags=validPhotos.map((src,idx)=>`
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:10px;font-weight:700;color:#8aada8;text-align:center">${idx===2?'참석자 서명지':('참석자 사진 '+(idx+1))}</div>
+      <img src="${src}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:2px solid #d4e6e1;background:#f8f8f8">
+    </div>
   `).join('');
 
   const safetyRows=d.hazardSafety.length
@@ -1300,9 +1306,9 @@ async function buildImageCanvas(d){
         </div>
       </div>
       <div style="background:#f0f4f3;border-radius:10px;padding:14px 16px;margin-bottom:16px;border-left:4px solid #2aab8e">
-        <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:6px">프로젝트명</div>
-        <div style="font-size:16px;font-weight:700;color:#1a2b28;margin-bottom:${d.workContent?'10px':'0'}">${d.projName||'-'}</div>
-        ${d.workContent?`<div style="font-size:12px;color:#4a6860;line-height:1.7;border-top:1px solid #d4e6e1;padding-top:8px">${d.workContent}</div>`:''}
+        <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:6px">프로젝트명 / 작업내용</div>
+        <div style="font-size:16px;font-weight:700;color:#1a2b28;margin-bottom:10px">${esc(d.projName)||'-'}</div>
+        <div style="font-size:12px;color:#4a6860;line-height:1.7;border-top:1px solid #d4e6e1;padding-top:8px">📋 작업내용: ${esc(d.workContent)||'(미입력)'}</div>
       </div>
       ${d.members.length?`<div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
