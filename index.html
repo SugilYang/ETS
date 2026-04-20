@@ -16,6 +16,161 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
+/* ══════════════════════════════════════
+   시작 스플래시 로딩 화면
+   ══════════════════════════════════════ */
+#splashScreen{
+  position:fixed;inset:0;z-index:10000;
+  background:
+    radial-gradient(ellipse at top, rgba(42,171,142,.25) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(30,143,118,.35) 0%, transparent 55%),
+    linear-gradient(160deg,#0a1f18 0%,#0f2922 40%,#1a3d34 80%,#0d2118 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#splashScreen.hide{animation:splashFadeOut .5s ease forwards}
+@keyframes splashFadeOut{to{opacity:0;pointer-events:none;transform:scale(1.05)}}
+
+/* 배경 데코 원 */
+.sp-bg-orb{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle, rgba(42,171,142,.18), transparent 70%);
+  pointer-events:none;
+}
+.sp-bg-orb.orb1{width:420px;height:420px;top:-100px;left:-120px;animation:floatOrb 8s ease-in-out infinite}
+.sp-bg-orb.orb2{width:340px;height:340px;bottom:-80px;right:-100px;animation:floatOrb 10s ease-in-out infinite reverse}
+@keyframes floatOrb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.08)}}
+
+/* 중앙 로고 영역 */
+.sp-center{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  z-index:2;
+}
+
+/* 회전 링 */
+.sp-ring{
+  position:relative;width:140px;height:140px;margin-bottom:26px;
+  animation:spIn .7s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes spIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.sp-ring::before, .sp-ring::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  border:2px solid transparent;
+}
+.sp-ring::before{
+  border-top-color:#2aab8e;border-right-color:#2aab8e;
+  animation:spinRing 1.6s linear infinite;
+  box-shadow:0 0 24px rgba(42,171,142,.5);
+}
+.sp-ring::after{
+  border-bottom-color:rgba(126,245,220,.45);border-left-color:rgba(126,245,220,.45);
+  animation:spinRing 2.4s linear infinite reverse;
+  inset:8px;
+}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+
+/* 가운데 아이콘 */
+.sp-icon{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:56px;animation:iconBounce .7s cubic-bezier(.34,1.56,.64,1) .1s both, iconPulse 2.2s ease-in-out 1s infinite;
+  filter:drop-shadow(0 4px 16px rgba(42,171,142,.6));
+}
+@keyframes iconBounce{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* 체크마크 애니메이션 (로딩 후반부) */
+.sp-check{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.5);transition:none;
+}
+.sp-check.show{
+  animation:checkIn .5s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes checkIn{
+  0%{opacity:0;transform:scale(.3) rotate(-30deg)}
+  60%{opacity:1;transform:scale(1.2) rotate(0)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+.sp-check svg{width:72px;height:72px;filter:drop-shadow(0 4px 16px rgba(126,245,220,.7))}
+
+.sp-company{
+  font-size:11px;font-weight:700;color:rgba(255,255,255,.55);
+  letter-spacing:6px;margin-bottom:10px;
+  animation:fadeSlideUp .5s ease .3s both;
+}
+.sp-title{
+  font-size:34px;font-weight:900;color:#fff;
+  letter-spacing:-1px;margin-bottom:8px;line-height:1;
+  text-shadow:0 2px 20px rgba(42,171,142,.4);
+  animation:fadeSlideUp .5s ease .45s both;
+}
+.sp-sub{
+  font-size:13px;font-weight:500;color:rgba(255,255,255,.6);
+  letter-spacing:.5px;margin-bottom:44px;
+  animation:fadeSlideUp .5s ease .6s both;
+}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* 진행 단계 점 */
+.sp-steps{
+  display:flex;gap:14px;margin-bottom:24px;
+  animation:fadeSlideUp .5s ease .75s both;
+}
+.sp-step{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  opacity:.3;transition:opacity .3s;
+}
+.sp-step.active{opacity:1}
+.sp-step.done{opacity:1}
+.sp-step-dot{
+  width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3);
+  transition:all .4s;position:relative;
+}
+.sp-step.active .sp-step-dot{
+  background:#2aab8e;box-shadow:0 0 0 4px rgba(42,171,142,.25), 0 0 16px rgba(42,171,142,.6);
+  animation:stepPulse 1s ease-in-out infinite;
+}
+.sp-step.done .sp-step-dot{
+  background:#7ef5dc;box-shadow:0 0 12px rgba(126,245,220,.6);
+}
+.sp-step.done .sp-step-dot::after{
+  content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#0a1f18;font-size:9px;font-weight:900;
+}
+@keyframes stepPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.sp-step-label{
+  font-size:10px;font-weight:600;color:rgba(255,255,255,.7);
+  letter-spacing:.3px;white-space:nowrap;
+}
+
+/* 진행바 */
+.sp-progress-wrap{
+  width:220px;height:3px;background:rgba(255,255,255,.12);border-radius:10px;
+  overflow:hidden;position:relative;
+  animation:fadeSlideUp .5s ease .9s both;
+}
+.sp-progress-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#2aab8e,#7ef5dc,#2aab8e);
+  background-size:200% 100%;border-radius:10px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  animation:shimmer 2s linear infinite;
+  box-shadow:0 0 12px rgba(42,171,142,.6);
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.sp-status{
+  margin-top:18px;font-size:12px;font-weight:500;
+  color:rgba(255,255,255,.55);letter-spacing:.3px;min-height:16px;
+  animation:fadeSlideUp .5s ease 1.05s both;
+}
+
+.sp-footer{
+  position:absolute;bottom:30px;left:0;right:0;text-align:center;
+  font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;font-weight:600;
+  animation:fadeSlideUp .5s ease 1.2s both;
+}
+
 /* ── 접근 제어 오버레이 ── */
 #accessOverlay{
   position:fixed;inset:0;z-index:9999;
@@ -297,9 +452,96 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 .sig-clear{flex:1;padding:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer}
 .sig-done{flex:2;padding:8px;background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;border-radius:9px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
 .sig-preview{width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:8px;border:1.5px solid var(--teal-m);display:none;padding:4px}
+
+/* 서명 모드 토글 */
+.sig-mode-toggle{display:flex;gap:8px;margin-bottom:16px}
+.sig-mode-btn{
+  flex:1;padding:14px 8px;background:#fff;border:1.5px solid var(--border);
+  border-radius:12px;color:var(--text2);font-family:'Noto Sans KR',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:all .2s;
+}
+.sig-mode-btn .sig-mode-desc{font-size:10px;font-weight:500;color:var(--text3);margin-top:2px}
+.sig-mode-btn:active{transform:scale(.98)}
+.sig-mode-btn.active{
+  background:linear-gradient(135deg,var(--teal),var(--teal2));
+  border-color:var(--teal2);color:#fff;
+  box-shadow:0 3px 10px rgba(42,171,142,.3);
+}
+.sig-mode-btn.active .sig-mode-desc{color:rgba(255,255,255,.8)}
+
+/* 서명지 사진 촬영 박스 */
+.sig-photo-slot{
+  border-radius:12px;border:2px dashed var(--teal);background:var(--teal-l);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;transition:all .2s;
+  padding:32px 18px;min-height:140px;
+}
+.sig-photo-slot:active{transform:scale(.99)}
+.sig-photo-slot input[type=file]{display:none}
+.sig-photo-slot .sp-icon{font-size:44px;color:var(--teal2);margin-bottom:8px}
+.sig-photo-slot .sp-title{font-size:14px;color:var(--teal2);font-weight:700;margin-bottom:3px}
+.sig-photo-slot .sp-sub{font-size:12px;color:var(--text3)}
+.sig-photo-slot img{width:100%;height:auto;display:block;border-radius:9px;max-height:360px;object-fit:contain;background:#fff}
+.sig-photo-slot .sp-remove{
+  position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;
+  border:none;border-radius:50%;width:30px;height:30px;font-size:16px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;font-weight:700;
+}
+.sig-photo-slot.has .sp-remove{display:flex}
+.sig-photo-slot.has{border-style:solid;padding:8px;background:#fff}
+.sig-photo-slot.has .sp-icon,
+.sig-photo-slot.has .sp-title,
+.sig-photo-slot.has .sp-sub{display:none}
 </style>
 </head>
 <body>
+
+<!-- ══════════════════════════════════════
+     시작 스플래시 화면
+══════════════════════════════════════ -->
+<div id="splashScreen">
+  <div class="sp-bg-orb orb1"></div>
+  <div class="sp-bg-orb orb2"></div>
+
+  <div class="sp-center">
+    <div class="sp-ring">
+      <div class="sp-icon" id="spIcon">🦺</div>
+      <div class="sp-check" id="spCheck">
+        <svg viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#7ef5dc" stroke-width="3" fill="rgba(126,245,220,.15)"/>
+          <path d="M14 24l7 7 14-14" stroke="#7ef5dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+    </div>
+    <div class="sp-company">ETS SAFETY MANAGEMENT</div>
+    <div class="sp-title">안전점검조회</div>
+    <div class="sp-sub">Tool Box Meeting · TBM</div>
+
+    <div class="sp-steps" id="spSteps">
+      <div class="sp-step" data-step="0">
+        <div class="sp-step-dot"></div>
+        <div class="sp-step-label">시스템</div>
+      </div>
+      <div class="sp-step" data-step="1">
+        <div class="sp-step-dot"></div>
+        <div class="sp-step-label">보안 확인</div>
+      </div>
+      <div class="sp-step" data-step="2">
+        <div class="sp-step-dot"></div>
+        <div class="sp-step-label">준비 완료</div>
+      </div>
+    </div>
+
+    <div class="sp-progress-wrap">
+      <div class="sp-progress-bar" id="spProgressBar"></div>
+    </div>
+    <div class="sp-status" id="spStatus">시스템 초기화 중...</div>
+  </div>
+
+  <div class="sp-footer">SAFETY FIRST · ETS</div>
+</div>
 
 <!-- ══════════════════════════════════════
      접근 제어 오버레이
@@ -352,38 +594,39 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
 <div class="prog-wrap">
   <div class="step-lbls">
-    <span class="slbl on" id="lb0">기본정보</span>
-    <span class="slbl" id="lb1">참석자</span>
-    <span class="slbl" id="lb2">위험성평가</span>
-    <span class="slbl" id="lb3">안전조치</span>
-    <span class="slbl" id="lb4">사진·비고</span>
-    <span class="slbl" id="lb5">서명</span>
-    <span class="slbl" id="lb6">제출</span>
+    <span class="slbl on" id="lb0">작성</span>
+    <span class="slbl" id="lb1">사진·서명</span>
+    <span class="slbl" id="lb2">제출</span>
   </div>
-  <div class="prog-track"><div class="prog-bar" id="pBar" style="width:5%"></div></div>
+  <div class="prog-track"><div class="prog-bar" id="pBar" style="width:10%"></div></div>
   <div class="dots">
-    <div class="dot on" id="d0"></div><div class="dot" id="d1"></div>
-    <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
-    <div class="dot" id="d4"></div><div class="dot" id="d5"></div>
-    <div class="dot" id="d6"></div>
+    <div class="dot on" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
   </div>
 </div>
 
 <div class="steps" id="stepsWrap">
 
-  <!-- STEP 1 기본정보 -->
+  <!-- PAGE 1: 기본정보 + 참석자 + 위험요소 + 안전조치 -->
   <div class="step active" id="s0">
-    <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">STEP 1 / 7</div><div class="h-ttl">기본 정보</div></div></div>
+    <div class="hero"><div class="h-icon">📋</div><div><div class="h-num">PAGE 1 / 3</div><div class="h-ttl">작업 정보 작성</div></div></div>
+
     <!-- TBM 운영 가이드 -->
     <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;border-radius:13px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px">📌 TBM 운영 가이드</div>
       <div style="font-size:12px;color:#78350f;line-height:1.85">
-        <div>① <b>작업 전</b> — STEP 1~4 안전조치까지 미리 작성</div>
+        <div>① <b>작업 전</b> — 이 페이지에서 모든 정보 미리 작성</div>
         <div>② <b>현장 집합</b> — 작성 내용 보며 팀원에게 구두 교육</div>
-        <div>③ <b>교육 후</b> — 참석자 사진 촬영</div>
-        <div>④ <b>서명</b> — 스마트폰 순서대로 돌려 각자 손글씨 서명</div>
-        <div>⑤ <b>제출</b> — 카카오톡 단톡방으로 보고서 공유</div>
+        <div>③ <b>교육 후</b> — 참석자 사진 촬영 + 서명 받기</div>
+        <div>④ <b>제출</b> — 카카오톡 단톡방으로 보고서 공유</div>
       </div>
+    </div>
+
+    <!-- [섹션 1] 기본정보 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(var(--teal),var(--teal2));border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">① 기본 정보</div>
     </div>
     <div class="card">
       <div class="row2" style="margin-bottom:15px">
@@ -414,11 +657,12 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         <textarea id="workContent" placeholder="금일 진행 예정 작업 내용을 입력하세요" rows="3"></textarea>
       </div>
     </div>
-  </div>
 
-  <!-- STEP 2 참석자 -->
-  <div class="step" id="s1">
-    <div class="hero"><div class="h-icon">👷</div><div><div class="h-num">STEP 2 / 6</div><div class="h-ttl">팀원 / 참석자 명단</div></div></div>
+    <!-- [섹션 2] 참석자 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(var(--teal),var(--teal2));border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">② 팀원 / 참석자 명단</div>
+    </div>
     <div class="card">
       <div class="fld">
         <label>참석자 이름</label>
@@ -426,13 +670,14 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         <div class="member-hint">※ 카톡이나 미리 작성 될 명단을 보유 후 복사&붙여넣기 하세요</div>
       </div>
     </div>
-  </div>
 
-  <!-- STEP 3 위험요소 -->
-  <div class="step" id="s2">
-    <div class="hero"><div class="h-icon">⚠️</div><div><div class="h-num">STEP 3 / 6</div><div class="h-ttl">위험성평가 / 위험요소</div></div></div>
+    <!-- [섹션 3] 위험요소 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(#e05252,#c84343);border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">③ 위험성평가 / 위험요소</div>
+    </div>
     <div class="card">
-      <label style="margin-bottom:12px">산업안전보건법 기준 — 해당 항목 선택 후 위험도 평가</label>
+      <label style="margin-bottom:12px">산업안전보건법 기준 — 해당 항목 선택</label>
       <div class="haz-grid" id="hazGrid">
         <div class="haz" onclick="toggleH(this)">⚙️ 기계·기구 위험</div>
         <div class="haz" onclick="toggleH(this)">🔩 협착·끼임</div>
@@ -457,14 +702,19 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         <label>직접 입력 (추가 위험요소)</label>
         <textarea id="hazExtra" placeholder="위 목록에 없는 위험요소를 직접 입력하세요" rows="2"></textarea>
       </div>
+      <button type="button" onclick="buildSafetyInputs()"
+        style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;border-radius:11px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(42,171,142,.3)">
+        ⬇️ 선택 완료 — 안전조치 작성으로
+      </button>
     </div>
-  </div>
 
-  <!-- STEP 4 안전조치 (위험요소별) -->
-  <div class="step" id="s3">
-    <div class="hero"><div class="h-icon">🦺</div><div><div class="h-num">STEP 4 / 6</div><div class="h-ttl">위험요소별 안전조치</div></div></div>
+    <!-- [섹션 4] 안전조치 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(var(--teal),var(--teal2));border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">④ 위험요소별 안전조치</div>
+    </div>
     <div class="card" id="safetyCard">
-      <div class="no-haz-msg" id="noHazMsg">⬅️ STEP 3에서 위험요소를 먼저 선택해주세요</div>
+      <div class="no-haz-msg" id="noHazMsg">⬆️ 위에서 위험요소를 먼저 선택해주세요</div>
       <div class="haz-safety-list" id="hazSafetyList"></div>
     </div>
     <div class="card" id="extraSafetyCard" style="display:none">
@@ -475,9 +725,15 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
     </div>
   </div>
 
-  <!-- STEP 5 사진·비고 -->
-  <div class="step" id="s4">
-    <div class="hero"><div class="h-icon">📸</div><div><div class="h-num">STEP 5 / 7</div><div class="h-ttl">참석자 사진 · 특이사항</div></div></div>
+  <!-- PAGE 2: 사진·비고 + 서명 -->
+  <div class="step" id="s1">
+    <div class="hero"><div class="h-icon">📸</div><div><div class="h-num">PAGE 2 / 3</div><div class="h-ttl">참석자 사진 · 서명</div></div></div>
+
+    <!-- [섹션 1] 사진 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(#f59e0b,#d97706);border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">① 참석자 사진</div>
+    </div>
     <div class="card">
       <div class="photo-section">
         <div class="photo-label">참석자 식별이 가능하도록 사진 촬영 必 <span class="badge">최대 2장</span></div>
@@ -499,6 +755,12 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         </div>
       </div>
     </div>
+
+    <!-- [섹션 2] 환자 여부 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(#e05252,#c84343);border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">② 환자 · 음주자 발생 여부</div>
+    </div>
     <div class="card">
       <div class="fld">
         <label>🚑 작업 전 환자 또는 음주자 발생 여부</label>
@@ -518,23 +780,51 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- STEP 6 참석자 서명 -->
-  <div class="step" id="s5">
-    <div class="hero"><div class="h-icon">✍️</div><div><div class="h-num">STEP 6 / 7</div><div class="h-ttl">참석자 서명</div></div></div>
+    <!-- [섹션 3] 서명 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+      <div style="width:4px;height:18px;background:linear-gradient(#7c3aed,#6d28d9);border-radius:2px"></div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">③ 참석자 서명</div>
+    </div>
     <div class="card">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-        📱 스마트폰을 순서대로 전달하여 각 참석자가 직접 서명해 주세요.<br>
-        <span style="font-size:12px;color:var(--text3)">서명은 최종 보고서에 포함됩니다.</span>
+      <!-- 모드 선택 (전체 공통) -->
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">
+        서명 방식을 선택하세요.
       </div>
-      <div id="sigList"></div>
+      <div class="sig-mode-toggle" id="sigModeToggle">
+        <button type="button" class="sig-mode-btn active" id="sigModeDraw" onclick="setSigMode('draw')">
+          <span style="font-size:20px">✍️</span>
+          <span>직접 서명</span>
+          <span class="sig-mode-desc">참석자별 손글씨 서명</span>
+        </button>
+        <button type="button" class="sig-mode-btn" id="sigModePhoto" onclick="setSigMode('photo')">
+          <span style="font-size:20px">📷</span>
+          <span>서명지 촬영</span>
+          <span class="sig-mode-desc">출력한 서명지 한 장 업로드</span>
+        </button>
+      </div>
+
+      <!-- 모드 A: 직접 서명 (참석자별 순차) -->
+      <div id="sigDrawArea">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.6">
+          📱 스마트폰을 순서대로 전달하여 각 참석자가 직접 서명해 주세요.
+        </div>
+        <div id="sigList"></div>
+      </div>
+
+      <!-- 모드 B: 서명지 사진 촬영 (1개) -->
+      <div id="sigPhotoArea" style="display:none">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.6">
+          📷 참석자 전원이 서명한 서명지를 사진으로 촬영해 주세요.
+        </div>
+        <div id="sigPhotoBox"></div>
+      </div>
     </div>
   </div>
 
-  <!-- STEP 7 최종확인 -->
-  <div class="step" id="s6">
-    <div class="hero"><div class="h-icon">✅</div><div><div class="h-num">STEP 7 / 7</div><div class="h-ttl">최종 확인 · 제출</div></div></div>
+  <!-- PAGE 3: 최종확인 -->
+  <div class="step" id="s2">
+    <div class="hero"><div class="h-icon">✅</div><div><div class="h-num">PAGE 3 / 3</div><div class="h-ttl">최종 확인 · 제출</div></div></div>
     <div class="card" id="sumCard"></div>
   </div>
 
@@ -557,11 +847,56 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 
 <div id="toast"></div>
 
-<!-- Canvas 기반 PDF: html2canvas + jsPDF -->
+<!-- html2canvas (이미지 생성용) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+// ══════════════════════════════════════════════════════════
+//  시작 스플래시 화면 진행 로직
+// ══════════════════════════════════════════════════════════
+(function runSplash(){
+  const steps = [
+    { pct: 15, label:'시스템 초기화 중...',  stepIdx: 0 },
+    { pct: 40, label:'안전 시스템 로딩...', stepIdx: 0 },
+    { pct: 65, label:'보안 모듈 확인 중...', stepIdx: 1 },
+    { pct: 88, label:'준비를 마무리하는 중...', stepIdx: 2 },
+    { pct: 100, label:'준비 완료 ✓', stepIdx: 2, done:true },
+  ];
+  let i = 0;
+  const bar = document.getElementById('spProgressBar');
+  const status = document.getElementById('spStatus');
+  const spSteps = document.querySelectorAll('#spSteps .sp-step');
+
+  function tick(){
+    if(i >= steps.length){
+      // 체크마크 표시
+      document.getElementById('spIcon').style.opacity = '0';
+      document.getElementById('spCheck').classList.add('show');
+      // 0.6초 후 스플래시 종료
+      setTimeout(()=>{
+        const sp = document.getElementById('splashScreen');
+        if(sp){ sp.classList.add('hide'); setTimeout(()=>sp.style.display='none', 500); }
+      }, 600);
+      return;
+    }
+    const s = steps[i];
+    if(bar) bar.style.width = s.pct + '%';
+    if(status) status.textContent = s.label;
+    // 스텝 업데이트
+    spSteps.forEach((el, idx)=>{
+      el.classList.remove('active','done');
+      if(idx < s.stepIdx) el.classList.add('done');
+      else if(idx === s.stepIdx) el.classList.add(s.done ? 'done' : 'active');
+    });
+    i++;
+    // 간격: 첫번째 느리게 시작, 중간은 빠르게, 마지막은 조금 여유
+    const delays = [450, 400, 400, 380, 350];
+    setTimeout(tick, delays[i-1] || 400);
+  }
+  // 0.5초 후 시작 (로고 등장 애니메이션 대기)
+  setTimeout(tick, 500);
+})();
+
 // ══════════════════════════════════════════════════════════
 //  ⚙️  관리자 설정 — 이 부분만 수정하세요 (GitHub에서)
 // ══════════════════════════════════════════════════════════
@@ -600,7 +935,14 @@ function tryAccess(){
     accessGranted = true;
     const ov = document.getElementById('accessOverlay');
     ov.classList.add('hide');
-    setTimeout(()=>{ ov.style.display='none'; showNoticeIfNeeded(); }, 400);
+    setTimeout(()=>{
+      ov.style.display='none';
+      // 자동 저장된 내용이 있으면 복원 팝업, 아니면 공지 팝업
+      showRestorePrompt((restored)=>{
+        showNoticeIfNeeded();
+      });
+      attachAutosaveListeners();
+    }, 400);
   } else {
     const card = document.querySelector('.ac-card');
     const err = document.getElementById('acErr');
@@ -643,10 +985,10 @@ function skipNotice(){
 }
 
 // ══════════════════════════════════════════════════════════
-const TOTAL=7;
+const TOTAL=3;
 let cur=0;
 const photos=[null,null];
-const signatures={};  // {이름: dataURL}
+const signatures={ mode:'draw', drawSigs:{}, photoSig:null };
 // TBM 진행시간: 15~20분 랜덤
 const TBM_DURATION = Math.floor(Math.random()*6)+15; // 15,16,17,18,19,20 중 하나
 let incidentStatus='none'; // 환자발생 여부
@@ -656,7 +998,7 @@ const koreaDate = new Date(today.getTime() + (9 * 60 * 60 * 1000));
 document.getElementById('workDate').value = koreaDate.toISOString().slice(0, 10);
 
 function updProg(n){
-  const pct=[5,20,35,52,67,80,93];
+  const pct=[15,55,95];
   document.getElementById('pBar').style.width=pct[n]+'%';
   for(let i=0;i<TOTAL;i++){
     document.getElementById('lb'+i).className='slbl'+(i<n?' done':i===n?' on':'');
@@ -674,8 +1016,7 @@ function go(dir){
   cur=Math.max(0,Math.min(TOTAL-1,cur+dir));
   const pg=pages[cur];
   pg.className='step active'+(dir<0?' back':'');
-  if(cur===3)buildSafetyInputs();
-  if(cur===5)buildSignatureStep();
+  if(cur===1)buildSignatureStep();   // 페이지 2 진입 시 서명 UI 빌드
   setTimeout(()=>pg.classList.remove('back'),350);
   updProg(cur);
   if(cur===TOTAL-1)buildSum();
@@ -688,8 +1029,7 @@ function chk(s){
     if(!document.getElementById('author').value.trim()){toast('작성자 이름을 입력해주세요.','ng');return false;}
     if(!document.getElementById('workPlace').value){toast('작업장소를 선택해주세요.','ng');return false;}
     if(!document.getElementById('projName').value.trim()){toast('프로젝트명을 입력해주세요.','ng');return false;}
-  }
-  if(s===3){
+    // 안전조치 입력 검증 (페이지 1 안에 포함되어 있으므로 여기서 체크)
     const items=document.querySelectorAll('.haz-safety-textarea');
     let ok=true;
     items.forEach(ta=>{if(!ta.value.trim())ok=false;});
@@ -700,28 +1040,43 @@ function chk(s){
 
 function toggleH(el){
   el.classList.toggle('on');
+  // 변경 후 자동으로 안전조치 영역 재생성 (디바운스, 조용히)
+  if(window._hazRebuildTimer) clearTimeout(window._hazRebuildTimer);
+  window._hazRebuildTimer = setTimeout(()=>{
+    if(cur===0) {
+      const hazOn = document.querySelectorAll('.haz.on').length;
+      const hazExtra = document.getElementById('hazExtra')?.value.trim()||'';
+      if(hazOn>0 || hazExtra) {
+        buildSafetyInputs({silent:true});
+      } else {
+        document.getElementById('hazSafetyList').innerHTML='';
+        document.getElementById('noHazMsg').style.display='block';
+        document.getElementById('extraSafetyCard').style.display='none';
+      }
+    }
+  }, 300);
 }
 
 // ── 위험요소별 기본 대책 (ETS 현장 기준) ──
 const DEFAULT_MEASURES = {
-  '기계·기구 위험': '작업 전 기계 점검 및 이상유무 확인 (산업안전보건기준에 관한 규칙 제86조)\n방호장치 정상작동 여부 확인 후 작업 (산업안전보건기준에 관한 규칙 제87조)\n작업 중 불필요한 접근 금지 및 통제 (산업안전보건기준에 관한 규칙 제99조)\n기계 이상 발생 시 즉시 가동 중지 (산업안전보건기준에 관한 규칙 제86조)',
-  '협착·끼임': '작업 전 동력원 차단 및 LOTO 실시 (산업안전보건기준에 관한 규칙 제92조)\n회전체·구동부 방호커버 설치 확인 (산업안전보건기준에 관한 규칙 제87조)\n협착 위험부위 작업 시 2인 1조 진행 (산업안전보건기준에 관한 규칙 제99조)\n느슨한 옷·장갑 착용 금지 (산업안전보건기준에 관한 규칙 제88조)',
-  '절단·베임·찔림': '절삭공구 작업 시 내절단 장갑 착용 (산업안전보건기준에 관한 규칙 제32조)\n공구 사용 후 지정 위치에 보관 (산업안전보건기준에 관한 규칙 제86조)\n날카로운 부품 취급 시 보호구 착용 (산업안전보건기준에 관한 규칙 제32조)\n작업 전 공구 상태 점검 및 불량 교체 (산업안전보건기준에 관한 규칙 제86조)',
-  '파열·파괴·비래': '고압·진공 시스템 작업 전 압력 확인 (산업안전보건기준에 관한 규칙 제117조)\n안전보안경 착용 후 작업 실시 (산업안전보건기준에 관한 규칙 제32조)\n비래 위험구역 출입 통제 실시 (산업안전보건기준에 관한 규칙 제99조)\n에어 배관 연결부 체결 상태 확인 (산업안전보건기준에 관한 규칙 제117조)',
-  '추락·낙하': 'K사다리 사용 및 고정 상태 확인 후 작업 (산업안전보건기준에 관한 규칙 제43조)\n사다리·발판 사용 시 안전모 착용 필수 (산업안전보건기준에 관한 규칙 제32조)\n작업발판 설치 및 안전난간 확인 (산업안전보건기준에 관한 규칙 제43조)\n공구·부품 낙하 방지 조치 실시 (산업안전보건기준에 관한 규칙 제14조)',
-  '전도·넘어짐': '작업장 바닥 이물질 제거 및 정리정돈 (산업안전보건기준에 관한 규칙 제3조)\n미끄럼 방지 안전화 착용 확인 (산업안전보건기준에 관한 규칙 제32조)\n케이블·호스 바닥 노출 최소화 (산업안전보건기준에 관한 규칙 제3조)\n이동통로 확보 및 장애물 제거 (산업안전보건기준에 관한 규칙 제22조)',
-  '붕괴·무너짐': '적재물 높이 및 하중 초과 여부 확인 (산업안전보건기준에 관한 규칙 제39조)\n불안정한 적재 즉시 재정렬 실시 (산업안전보건기준에 관한 규칙 제39조)\n선반·랙 고정 볼트 체결 상태 확인 (산업안전보건기준에 관한 규칙 제39조)\n작업 전 주변 구조물 안전상태 확인 (산업안전보건기준에 관한 규칙 제37조)',
-  '중량물 취급': '20kg 이상 중량물 2인 1조 작업 (산업안전보건기준에 관한 규칙 제39조)\n호이스트·크레인 사용 시 신호수 배치 (산업안전보건기준에 관한 규칙 제40조)\n설비 이동 전 이동경로 사전 확인 (산업안전보건기준에 관한 규칙 제39조)\n중량물 하부 신체 진입 금지 (산업안전보건기준에 관한 규칙 제40조)',
-  '감전·전기': '작업 전 전원 차단 및 LOTO 실시 (산업안전보건기준에 관한 규칙 제92조)\n절연장갑·절연공구 착용 확인 (산업안전보건기준에 관한 규칙 제301조)\n제어반 내부 작업 시 2인 1조 (산업안전보건기준에 관한 규칙 제99조)\n통전 전 배선 상태 최종 확인 (산업안전보건기준에 관한 규칙 제304조)',
-  '화재·폭발': '인화성 물질 주변 화기 사용 금지 (산업안전보건기준에 관한 규칙 제232조)\n소화기 위치 사전 확인 및 점검 (산업안전보건기준에 관한 규칙 제232조)\n전기 과부하 방지 멀티탭 사용 제한 (산업안전보건기준에 관한 규칙 제304조)\n작업 후 전원 차단 및 정리 확인 (산업안전보건기준에 관한 규칙 제92조)',
-  '유해·화학물질': 'MSDS 사전 확인 후 작업 실시 (산업안전보건법 제114조)\n화학물질 취급 시 내화학 장갑·보안경 착용 (산업안전보건기준에 관한 규칙 제32조)\n취급 전 작업장 환기 선조치 실시 (산업안전보건기준에 관한 규칙 제422조)\n누출 시 즉시 작업 중지 및 신고 (산업안전보건법 제54조)',
-  '질식·산소결핍': '밀폐공간 작업 전 산소농도 측정 (산업안전보건기준에 관한 규칙 제619조)\n작업 중 지속적 환기 실시 (산업안전보건기준에 관한 규칙 제620조)\n감시인 배치 후 작업 진행 (산업안전보건기준에 관한 규칙 제623조)\n공기호흡기 등 호흡용 보호구 비치 (산업안전보건기준에 관한 규칙 제629조)',
-  '소음·진동': '고소음 작업 시 귀마개·귀덮개 착용 (산업안전보건기준에 관한 규칙 제517조)\n진동공구 작업 시간 제한 준수 (산업안전보건기준에 관한 규칙 제517조)\n작업 전 소음 발생 수준 사전 확인 (산업안전보건기준에 관한 규칙 제512조)\n방진장갑 착용으로 진동 노출 저감 (산업안전보건기준에 관한 규칙 제32조)',
-  '이상온도': '고온 부품 취급 시 내열장갑 착용 (산업안전보건기준에 관한 규칙 제32조)\n시운전 중 발열부위 접촉 금지 (산업안전보건기준에 관한 규칙 제86조)\n냉각 완료 확인 후 부품 취급 (산업안전보건기준에 관한 규칙 제86조)\n온도 이상 발생 시 즉시 가동 중지 (산업안전보건기준에 관한 규칙 제86조)',
-  '차량·운반기계': '지게차 이동 시 보행자 통로 분리 (산업안전보건기준에 관한 규칙 제179조)\n운반기계 작동 전 경보음 확인 (산업안전보건기준에 관한 규칙 제176조)\n하역·운반 시 유도자 배치 실시 (산업안전보건기준에 관한 규칙 제183조)\n적재 중량 초과 금지 확인 (산업안전보건기준에 관한 규칙 제178조)',
-  '미끄러짐': '바닥 오염물 즉시 제거 및 청소 (산업안전보건기준에 관한 규칙 제3조)\n미끄럼 방지 안전화 착용 확인 (산업안전보건기준에 관한 규칙 제32조)\n오일·냉각수 누출 즉시 처리 (산업안전보건기준에 관한 규칙 제3조)\n미끄럼 위험구역 경고 표시 부착 (산업안전보건기준에 관한 규칙 제37조)',
-  '기상 악화': '우천 시 실외 작업 중지 검토 (산업안전보건기준에 관한 규칙 제37조)\n강풍 시 낙하물 고정 및 정리 (산업안전보건기준에 관한 규칙 제14조)\n기상 악화 시 관리감독자 보고 후 대응 (산업안전보건법 제16조)\n우천 후 바닥 미끄럼 위험 확인 (산업안전보건기준에 관한 규칙 제3조)',
-  '보호구 미착용': '작업 전 보호구 착용 여부 전원 확인 (산업안전보건법 제38조)\n보호구 미착용자 작업 투입 금지 (산업안전보건법 제38조)\n보호구 파손·불량 시 즉시 교체 (산업안전보건기준에 관한 규칙 제32조)\n보호구 지급 및 착용 교육 실시 (산업안전보건법 제29조)',
+  '기계·기구 위험': '작업 전 기계 점검 및 이상유무 확인\n방호장치 정상작동 여부 확인 후 작업\n작업 중 불필요한 접근 금지 및 통제\n기계 이상 발생 시 즉시 가동 중지',
+  '협착·끼임': '작업 전 동력원 차단 및 LOTO 실시\n회전체·구동부 방호커버 설치 확인\n협착 위험부위 작업 시 2인 1조 진행\n느슨한 옷·장갑 착용 금지',
+  '절단·베임·찔림': '절삭공구 작업 시 내절단 장갑 착용\n공구 사용 후 지정 위치에 보관\n날카로운 부품 취급 시 보호구 착용\n작업 전 공구 상태 점검 및 불량 교체',
+  '파열·파괴·비래': '고압·진공 시스템 작업 전 압력 확인\n안전보안경 착용 후 작업 실시\n비래 위험구역 출입 통제 실시\n에어 배관 연결부 체결 상태 확인',
+  '추락·낙하': 'K사다리 사용 및 고정 상태 확인 후 작업\n사다리·발판 사용 시 안전모 착용 필수\n작업발판 설치 및 안전난간 확인\n공구·부품 낙하 방지 조치 실시',
+  '전도·넘어짐': '작업장 바닥 이물질 제거 및 정리정돈\n미끄럼 방지 안전화 착용 확인\n케이블·호스 바닥 노출 최소화\n이동통로 확보 및 장애물 제거',
+  '붕괴·무너짐': '적재물 높이 및 하중 초과 여부 확인\n불안정한 적재 즉시 재정렬 실시\n선반·랙 고정 볼트 체결 상태 확인\n작업 전 주변 구조물 안전상태 확인',
+  '중량물 취급': '20kg 이상 중량물 2인 1조 작업\n호이스트·크레인 사용 시 신호수 배치\n설비 이동 전 이동경로 사전 확인\n중량물 하부 신체 진입 금지',
+  '감전·전기': '작업 전 전원 차단 및 LOTO 실시\n절연장갑·절연공구 착용 확인\n제어반 내부 작업 시 2인 1조\n통전 전 배선 상태 최종 확인',
+  '화재·폭발': '인화성 물질 주변 화기 사용 금지\n소화기 위치 사전 확인 및 점검\n전기 과부하 방지 멀티탭 사용 제한\n작업 후 전원 차단 및 정리 확인',
+  '유해·화학물질': 'MSDS 사전 확인 후 작업 실시\n화학물질 취급 시 내화학 장갑·보안경 착용\n취급 전 작업장 환기 선조치 실시\n누출 시 즉시 작업 중지 및 신고',
+  '질식·산소결핍': '밀폐공간 작업 전 산소농도 측정\n작업 중 지속적 환기 실시\n감시인 배치 후 작업 진행\n공기호흡기 등 호흡용 보호구 비치',
+  '소음·진동': '고소음 작업 시 귀마개·귀덮개 착용\n진동공구 작업 시간 제한 준수\n작업 전 소음 발생 수준 사전 확인\n방진장갑 착용으로 진동 노출 저감',
+  '이상온도': '고온 부품 취급 시 내열장갑 착용\n시운전 중 발열부위 접촉 금지\n냉각 완료 확인 후 부품 취급\n온도 이상 발생 시 즉시 가동 중지',
+  '차량·운반기계': '지게차 이동 시 보행자 통로 분리\n운반기계 작동 전 경보음 확인\n하역·운반 시 유도자 배치 실시\n적재 중량 초과 금지 확인',
+  '미끄러짐': '바닥 오염물 즉시 제거 및 청소\n미끄럼 방지 안전화 착용 확인\n오일·냉각수 누출 즉시 처리\n미끄럼 위험구역 경고 표시 부착',
+  '기상 악화': '우천 시 실외 작업 중지 검토\n강풍 시 낙하물 고정 및 정리\n기상 악화 시 관리감독자 보고 후 대응\n우천 후 바닥 미끄럼 위험 확인',
+  '보호구 미착용': '작업 전 보호구 착용 여부 전원 확인\n보호구 미착용자 작업 투입 금지\n보호구 파손·불량 시 즉시 교체\n보호구 지급 및 착용 교육 실시',
 };
 
 // 위험도 선택
@@ -775,7 +1130,9 @@ function splitIconText(str){
 }
 
 // 위험요소별 안전조치 입력 생성
-function buildSafetyInputs(){
+function buildSafetyInputs(opts){
+  opts = opts || {};
+  const silent = opts.silent === true;
   const selected=[...document.querySelectorAll('.haz.on')].map(el=>{
     const{icon,label}=splitIconText(el.textContent);
     return{icon,label};
@@ -790,6 +1147,18 @@ function buildSafetyInputs(){
   const list=document.getElementById('hazSafetyList');
   const noMsg=document.getElementById('noHazMsg');
   const extraCard=document.getElementById('extraSafetyCard');
+
+  if(!silent){
+    if(selected.length===0){
+      toast('위험요소를 먼저 선택해주세요','ng');
+    } else {
+      toast('✅ 아래 안전조치 항목에 작성해주세요','ok');
+      setTimeout(()=>{
+        const safetyCard=document.getElementById('safetyCard');
+        if(safetyCard) safetyCard.scrollIntoView({behavior:'smooth',block:'start'});
+      },150);
+    }
+  }
 
   // 기존 값 보존
   const savedValues={};
@@ -928,7 +1297,11 @@ function collect(){
     incidentStatus,
     incidentPerson,
     tbmDuration: TBM_DURATION,
-    signatures: {...signatures},
+    signatures: {
+      mode: signatures.mode,
+      drawSigs: {...signatures.drawSigs},
+      photoSig: signatures.photoSig,
+    },
   };
 }
 
@@ -1006,6 +1379,21 @@ function buildSum(){
     ? `<span style="color:#dc2626;font-weight:700">발생</span> — ${esc(d.incidentPerson)||'대상자 미기입'}`
     : `<span style="color:#16a34a;font-weight:700">없음</span>`;
 
+  // 서명 상태 요약
+  const sigMode = d.signatures?.mode || 'draw';
+  let sigHtml;
+  if(sigMode==='photo'){
+    sigHtml = d.signatures?.photoSig
+      ? `<span style="color:#16a34a;font-weight:700">📷 서명지 촬영 완료</span>`
+      : `<span style="color:#dc2626;font-weight:700">📷 서명지 미등록</span>`;
+  } else {
+    const signedCount = Object.keys(d.signatures?.drawSigs||{}).length;
+    const total = d.members.length;
+    sigHtml = total>0
+      ? `<span style="color:${signedCount===total?'#16a34a':'#d97706'};font-weight:700">✍️ 직접 서명 ${signedCount}/${total}명</span>`
+      : `<span style="color:#8aada8">-</span>`;
+  }
+
   document.getElementById('sumCard').innerHTML=`
     <div class="sum-item"><div class="sk">작업일자</div><div class="sv">${esc(d.workDate)||'-'}</div></div>
     <div class="sum-item"><div class="sk">작성자</div><div class="sv">${esc(d.author)||'-'}</div></div>
@@ -1016,6 +1404,7 @@ function buildSum(){
     <div class="sum-item"><div class="sk">참석자</div><div class="sv">${d.members.length?esc(d.members.join(', ')):'-'}</div></div>
     <div class="sum-item"><div class="sk">안전조치</div><div class="sv">${safetyHtml}</div></div>
     <div class="sum-item"><div class="sk">환자·부상자</div><div class="sv">${incidentHtml}</div></div>
+    <div class="sum-item"><div class="sk">서명</div><div class="sv">${sigHtml}</div></div>
     <div class="sum-item"><div class="sk">사진</div><div class="sv">${photoHtml}</div></div>
   `;
 }
@@ -1027,278 +1416,14 @@ function toast(msg,type='ok'){
 }
 
 // ──────────────────────────────────────────────
-// PDF 생성 (Canvas 렌더링 → 한글 완벽 지원)
-// A4 한 장, 세련된 디자인
+// 이미지 파일 생성 (카카오톡 공유용 JPG)
 // ──────────────────────────────────────────────
-async function buildPDFCanvas(d){
-  // PDF 레이아웃을 위한 숨김 div 생성
-  const wrap=document.createElement('div');
-  wrap.id='pdfRender';
-  wrap.style.cssText=`
-    position:fixed;left:-9999px;top:0;
-    width:794px;background:#fff;
-    font-family:'Noto Sans KR',sans-serif;
-    font-size:13px;color:#1a2b28;
-    padding:0;margin:0;
-  `;
-
-  const validPhotos=photos.filter(Boolean);
-  const photoCount=validPhotos.length;
-
-  // 사진 레이아웃: 1개→반칸, 2개→한줄2개, 3개→윗줄2+아랫줄1
-  function makePhotoGrid(photos){
-    const labels=['참석자 사진 1','참석자 사진 2','참석자 서명지'];
-    const card=(src,idx)=>`
-      <div style="width:calc(50% - 5px);display:inline-block;vertical-align:top;margin-bottom:8px">
-        <div style="font-size:9px;font-weight:700;color:#8aada8;margin-bottom:3px;text-align:center">${labels[idx]||('사진'+(idx+1))}</div>
-        <img src="${src}" style="width:100%;height:auto;border-radius:8px;border:2px solid #d4e6e1;display:block">
-      </div>`;
-    if(photos.length===1) return `<div style="display:flex;gap:10px">${card(photos[0],0)}</div>`;
-    if(photos.length===2) return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>`;
-    return `<div style="display:flex;gap:10px">${card(photos[0],0)}${card(photos[1],1)}</div>
-            <div style="display:flex;gap:10px">${card(photos[2],2)}</div>`;
-  }
-  const photoImgTags=makePhotoGrid(validPhotos);
-
-  // 안전조치 행 생성
-  const safetyRows=d.hazardSafety.length
-    ? d.hazardSafety.map((h,i)=>{
-        const riskColor=h.risk==='상'?'#dc2626':h.risk==='중'?'#d97706':'#16a34a';
-        const riskBg=h.risk==='상'?'#fef2f2':h.risk==='중'?'#fffbeb':'#f0fdf4';
-        const riskAfterColor=h.riskAfter==='상'?'#dc2626':h.riskAfter==='중'?'#d97706':'#16a34a';
-        const riskAfterBg=h.riskAfter==='상'?'#fef2f2':h.riskAfter==='중'?'#fffbeb':'#f0fdf4';
-        // 대책 줄바꿈 처리 - 줄바꿈, •, (법령) 분리
-        const actionLines = h.action
-          ? h.action.split('\n').map(l=>l.trim()).filter(l=>l.length>0)
-          : [];
-        const actionHtml = actionLines.length > 0
-          ? actionLines.map(l=>{
-              const lawMatch = l.match(/\(([^)]+)\)\s*$/);
-              const lawRef = lawMatch ? lawMatch[1] : '';
-              const txt = l.replace(/^[•·\-▸]\s*/,'').replace(/\s*\([^)]+\)\s*$/,'').trim();
-              return `<div style="display:flex;align-items:flex-start;gap:5px;padding:3px 0;border-bottom:1px dashed #e0f0ec">
-                <span style="color:#2aab8e;font-weight:700;flex-shrink:0;font-size:11px;margin-top:2px">▸</span>
-                <div>
-                  <div style="font-size:12px;line-height:1.5;color:#1a2b28">${esc(txt)}</div>
-                  ${lawRef?`<div style="font-size:10px;color:#8aada8;margin-top:1px">📋 ${esc(lawRef)}</div>`:''}
-                </div>
-              </div>`;
-            }).join('')
-          : '<span style="color:#aaa;font-size:12px">-</span>';
-        return `
-        <tr style="background:${i%2===0?'#f8fdfc':'#ffffff'}">
-          <td style="padding:10px 12px;border-bottom:1px solid #e0f0ec;vertical-align:top">
-            <div style="font-weight:700;color:#1e8f76;font-size:12px;margin-bottom:3px">${h.icon} ${h.label}</div>
-            ${h.workContent?`<div style="font-size:11px;color:#8aada8;line-height:1.4">${esc(h.workContent)}</div>`:''}
-          </td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e0f0ec;text-align:center;vertical-align:top">
-            <span style="display:inline-block;background:${riskBg};color:${riskColor};font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;border:1.5px solid ${riskColor}">${h.risk||'-'}</span>
-          </td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e0f0ec;vertical-align:top;font-size:12px;color:#1a2b28">${actionHtml}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e0f0ec;text-align:center;vertical-align:top">
-            <span style="display:inline-block;background:${riskAfterBg};color:${riskAfterColor};font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;border:1.5px solid ${riskAfterColor}">${h.riskAfter||'-'}</span>
-          </td>
-        </tr>`;
-      }).join('')
-    : `<tr><td colspan="4" style="padding:14px;color:#8aada8;text-align:center;font-size:12px">위험요소 없음</td></tr>`;
-
-  wrap.innerHTML=`
-  <div style="background:#fff;width:794px;padding:0;margin:0;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif">
-
-    <!-- 헤더 -->
-    <div style="background:linear-gradient(135deg,#0f2922 0%,#1e8f76 55%,#2aab8e 100%);padding:28px 40px 24px;position:relative;overflow:hidden">
-      <div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(255,255,255,.05);border-radius:50%"></div>
-      <div style="position:absolute;right:100px;bottom:-60px;width:160px;height:160px;background:rgba(255,255,255,.04);border-radius:50%"></div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.5),transparent 70%)"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;position:relative">
-        <div>
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:4px;margin-bottom:8px">ETS SAFETY MANAGEMENT</div>
-          <div style="font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.25)">TBM 안전점검조회</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:7px;letter-spacing:.5px">Tool Box Meeting · 작업 전 안전점검 보고서</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;text-align:center;min-width:100px">
-            <div style="font-size:9px;color:rgba(255,255,255,.6);letter-spacing:1px;margin-bottom:5px">작업일자</div>
-            <div style="font-size:14px;font-weight:800;color:#fff">${d.workDate||'-'}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:7px 12px;text-align:center">
-              <div style="font-size:9px;color:rgba(255,255,255,.55);margin-bottom:2px">TBM시간</div>
-              <div style="font-size:11px;font-weight:700;color:#fff">⏱ ${d.tbmDuration}분</div>
-            </div>
-            <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:7px 12px;text-align:center">
-              <div style="font-size:9px;color:rgba(255,255,255,.55);margin-bottom:2px">생성시각</div>
-              <div style="font-size:11px;font-weight:700;color:#fff">${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div style="padding:18px 40px 0">
-
-      <!-- 기본 정보 4칸 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px;margin-bottom:13px">
-        <div style="background:linear-gradient(135deg,#f0faf8,#e8f7f4);border-radius:10px;padding:11px 13px;border-top:3px solid #2aab8e;box-shadow:0 1px 4px rgba(42,171,142,.1)">
-          <div style="font-size:8px;font-weight:700;color:#8aada8;letter-spacing:1.5px;margin-bottom:5px">관리감독자</div>
-          <div style="font-size:13px;font-weight:800;color:#1a2b28">${esc(d.author)||'-'}</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f0faf8,#e8f7f4);border-radius:10px;padding:11px 13px;border-top:3px solid #2aab8e;box-shadow:0 1px 4px rgba(42,171,142,.1)">
-          <div style="font-size:8px;font-weight:700;color:#8aada8;letter-spacing:1.5px;margin-bottom:5px">작업장소</div>
-          <div style="font-size:13px;font-weight:800;color:#1a2b28">${esc(d.workPlace)||'-'}</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f0faf8,#e8f7f4);border-radius:10px;padding:11px 13px;border-top:3px solid #2aab8e;box-shadow:0 1px 4px rgba(42,171,142,.1)">
-          <div style="font-size:8px;font-weight:700;color:#8aada8;letter-spacing:1.5px;margin-bottom:5px">참석인원</div>
-          <div style="font-size:13px;font-weight:800;color:#1a2b28">${d.members.length}명</div>
-        </div>
-        <div style="background:linear-gradient(135deg,${d.incidentStatus==='yes'?'#fef2f2,#fee2e2':'#f0fdf4,#dcfce7'});border-radius:10px;padding:11px 13px;border-top:3px solid ${d.incidentStatus==='yes'?'#dc2626':'#16a34a'};box-shadow:0 1px 4px rgba(0,0,0,.06)">
-          <div style="font-size:8px;font-weight:700;color:#8aada8;letter-spacing:1.5px;margin-bottom:5px">부상·환자</div>
-          <div style="font-size:13px;font-weight:800;color:${d.incidentStatus==='yes'?'#dc2626':'#16a34a'}">${d.incidentStatus==='yes'?'🚑 발생':'✅ 없음'}</div>
-        </div>
-      </div>
-
-      <!-- 프로젝트명 + 작업내용 -->
-      <div style="background:linear-gradient(135deg,#f8fdfc,#f0faf8);border-radius:11px;padding:13px 16px;margin-bottom:13px;border:1.5px solid #d4e6e1;border-left:4px solid #2aab8e">
-        <div style="font-size:8px;font-weight:700;color:#8aada8;letter-spacing:1.5px;margin-bottom:5px">프로젝트명</div>
-        <div style="font-size:15px;font-weight:800;color:#1a2b28;margin-bottom:${d.workContent?'9px':'0'}">${esc(d.projName)||'-'}</div>
-        ${d.workContent?`<div style="font-size:11px;color:#4a6860;line-height:1.7;border-top:1px dashed #b2e4d8;padding-top:7px">📋 ${esc(d.workContent)}</div>`:''}
-      </div>
-
-      <!-- 참석자 명단 -->
-      ${d.members.length?`
-      <div style="margin-bottom:13px">
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
-          <div style="width:3px;height:13px;background:linear-gradient(#2aab8e,#1e8f76);border-radius:2px"></div>
-          <div style="font-size:10px;font-weight:800;color:#1a2b28;letter-spacing:.5px">참석자 명단</div>
-          <div style="background:#e8f7f4;color:#1e8f76;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;border:1px solid #b2e4d8">${d.members.length}명</div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px">
-          ${d.members.map(m=>`<span style="background:#fff;color:#1e8f76;border-radius:16px;padding:3px 10px;font-size:11px;font-weight:600;border:1.5px solid #b2e4d8;box-shadow:0 1px 3px rgba(42,171,142,.1)">${esc(m)}</span>`).join('')}
-        </div>
-      </div>`:''}
-
-      <!-- 위험성평가 테이블 -->
-      <div style="margin-bottom:13px">
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
-          <div style="width:3px;height:13px;background:linear-gradient(#e05252,#c84343);border-radius:2px"></div>
-          <div style="font-size:10px;font-weight:800;color:#1a2b28;letter-spacing:.5px">작업 전 위험성평가</div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;border:1.5px solid #d4e6e1;box-shadow:0 2px 10px rgba(42,171,142,.08)">
-          <thead>
-            <tr style="background:linear-gradient(135deg,#0f2922,#1e8f76)">
-              <th style="padding:10px 12px;text-align:left;color:#fff;font-size:10px;font-weight:700;width:160px">위험요소 / 작업내용</th>
-              <th style="padding:10px 8px;text-align:center;color:#fff;font-size:10px;font-weight:700;width:48px">조치전</th>
-              <th style="padding:10px 12px;text-align:left;color:#fff;font-size:10px;font-weight:700">안전조치 내용</th>
-              <th style="padding:10px 8px;text-align:center;color:#fff;font-size:10px;font-weight:700;width:48px">조치후</th>
-            </tr>
-          </thead>
-          <tbody>${safetyRows}</tbody>
-        </table>
-        ${d.safetyExtra?`<div style="background:#fffbf0;border:1.5px solid #fde68a;border-radius:8px;padding:9px 13px;margin-top:7px;font-size:11px;color:#4a6860;line-height:1.7"><span style="font-weight:700;color:#92400e">📌 추가조치 </span>${esc(d.safetyExtra)}</div>`:''}
-      </div>
-
-      <!-- 사진 -->
-      ${photoCount>0?`
-      <div style="margin-bottom:13px">
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
-          <div style="width:3px;height:13px;background:linear-gradient(#f59e0b,#d97706);border-radius:2px"></div>
-          <div style="font-size:10px;font-weight:800;color:#1a2b28;letter-spacing:.5px">참석자 사진</div>
-        </div>
-        ${photoImgTags}
-      </div>`:''}
-
-    </div>
-
-    <!-- 푸터 -->
-    <div style="margin:14px 40px 0;padding:14px 22px;background:linear-gradient(135deg,#0f2922,#1a3d34);border-radius:12px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:8px;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:4px">관리감독자 서명</div>
-        <div style="font-size:14px;font-weight:800;color:#fff">${esc(d.author)||'-'}</div>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:9px;color:rgba(255,255,255,.65);margin-bottom:3px">본 보고서는 작업 전 안전교육 완료 확인서입니다</div>
-        <div style="font-size:10px;color:#7ef5dc;font-weight:700">산업안전보건법 제29조에 의거 작성</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:8px;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:4px">안전보건관리책임자</div>
-        <div style="width:90px;height:1px;background:rgba(255,255,255,.25);margin-top:18px"></div>
-      </div>
-    </div>
-    <div style="height:20px"></div>
-
-  </div>`;
-
-  document.body.appendChild(wrap);
-
-  // 폰트 로드 대기
-  await document.fonts.ready;
-  await new Promise(r=>setTimeout(r,500));
-
-  const canvas=await html2canvas(wrap,{
-    scale:2,
-    useCORS:true,
-    allowTaint:true,
-    backgroundColor:'#ffffff',
-    logging:false,
-    width:794,
-    windowWidth:794,
-    height:wrap.scrollHeight,
-    windowHeight:wrap.scrollHeight,
-  });
-
-  document.body.removeChild(wrap);
-
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-  const pageW=doc.internal.pageSize.getWidth();   // 210mm
-  const pageH=doc.internal.pageSize.getHeight();  // 297mm
-
-  const imgData=canvas.toDataURL('image/jpeg',0.95);
-  const renderedH=(canvas.height/canvas.width)*pageW;
-
-  if(renderedH<=pageH){
-    // 1장에 들어오면 그대로
-    doc.addImage(imgData,'JPEG',0,0,pageW,renderedH);
-  } else {
-    // 2장 이상 - 페이지 나누기
-    let yOffset = 0;
-    while(yOffset < renderedH){
-      if(yOffset > 0) doc.addPage();
-      doc.addImage(imgData,'JPEG',0,-yOffset,pageW,renderedH);
-      yOffset += pageH;
-    }
-  }
-
-  return doc;
-}
-
 async function makeImageFile(d){
-  // 기존 buildPDFCanvas 에서 canvas 만드는 부분 재활용
-  const wrap=document.createElement('div');
-  wrap.id='pdfRender';
-  wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#1a2b28;padding:0;margin:0;`;
-
-  // buildPDFCanvas 와 동일한 HTML 구성 (doc 없이 canvas만)
-  const doc=await buildPDFCanvas(d);
-  // canvas 를 직접 뽑는 대신 buildPDFCanvas 내부에서 만든 canvas 재활용하기 어려우므로
-  // 이미지 데이터를 PDF blob에서 추출하지 않고 html2canvas 직접 호출
-  const pdfWrap=document.getElementById('pdfRender');
-  // buildPDFCanvas 가 wrap 을 지우므로 다시 만들어야 함
-  // 대신 doc 의 첫 페이지 이미지 데이터를 PNG 로 변환
-  const imgData=doc.output('datauristring');
-  // datauri 에서 blob 생성
-  const base64=imgData.split(',')[1];
-  const binary=atob(base64);
-  const arr=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
-  const pdfBlob=new Blob([arr],{type:'application/pdf'});
-
-  // PDF 대신 canvas 로 이미지 직접 생성
-  const imgCanvas=await buildImageCanvas(d);
-  const imgBlob=await new Promise(res=>imgCanvas.toBlob(res,'image/jpeg',0.92));
-  const fileName=`${(d.workDate||'TBM').replace(/-/g,'')}_${d.author||'작성자'}_TBM.jpg`;
-  const file=new File([imgBlob],fileName,{type:'image/jpeg'});
-  return{blob:imgBlob,file,fileName};
+  const imgCanvas = await buildImageCanvas(d);
+  const imgBlob = await new Promise(res=>imgCanvas.toBlob(res,'image/jpeg',0.92));
+  const fileName = `${(d.workDate||'TBM').replace(/-/g,'')}_${d.author||'작성자'}_TBM.jpg`;
+  const file = new File([imgBlob], fileName, {type:'image/jpeg'});
+  return {blob:imgBlob, file, fileName};
 }
 
 async function buildImageCanvas(d){
@@ -1316,16 +1441,33 @@ async function buildImageCanvas(d){
   }
   const photoImgTags=makePhotoGrid(validPhotos);
 
-  // 서명 HTML 생성
-  const sigEntries=d.members.map(m=>{
-    const sigData=d.signatures&&d.signatures[m];
+  // 서명 HTML 생성 - 모드에 따라 분기
+  const sigMode = (d.signatures && d.signatures.mode) || 'draw';
+  const drawSigs = (d.signatures && d.signatures.drawSigs) || {};
+  const photoSig = d.signatures && d.signatures.photoSig;
+
+  // 직접 서명 모드: 참석자별 서명 박스
+  const sigEntriesDraw = d.members.map(m=>{
+    const sigSrc = drawSigs[m] || '';
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:80px;max-width:120px">
       <div style="font-size:11px;font-weight:700;color:#1e8f76;text-align:center">${esc(m)}</div>
-      <div style="width:100%;height:56px;border-bottom:1.5px solid #b2e4d8;display:flex;align-items:flex-end;justify-content:center;background:#fafcfb;border-radius:6px;overflow:hidden">
-        ${sigData?`<img src="${sigData}" style="width:100%;height:56px;object-fit:contain">`:''}
+      <div style="width:100%;height:60px;border-bottom:1.5px solid #b2e4d8;display:flex;align-items:flex-end;justify-content:center;background:#fafcfb;border-radius:6px;overflow:hidden">
+        ${sigSrc?`<img src="${sigSrc}" style="width:100%;height:60px;object-fit:contain">`:''}
       </div>
     </div>`;
   }).join('');
+
+  // 서명 섹션 최종 HTML (모드별)
+  const sigSectionHtml = sigMode==='photo' && photoSig
+    ? `<div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:10px 12px">
+         <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:6px">📷 서명지 사진</div>
+         <img src="${photoSig}" style="width:100%;max-height:420px;object-fit:contain;display:block;border-radius:8px;background:#fff">
+       </div>`
+    : `<div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:14px 16px">
+         <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start">
+           ${sigEntriesDraw}
+         </div>
+       </div>`;
 
   const safetyRows=d.hazardSafety.length
     ? d.hazardSafety.map((h,i)=>{
@@ -1427,12 +1569,9 @@ async function buildImageCanvas(d){
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div style="width:3px;height:16px;background:linear-gradient(#7c3aed,#6d28d9);border-radius:2px"></div>
           <div style="font-size:12px;font-weight:700;color:#1a2b28">참석자 서명</div>
+          <div style="font-size:10px;color:#8aada8;margin-left:4px">${sigMode==='photo'?'서명지 촬영':'직접 서명'}</div>
         </div>
-        <div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:14px 16px">
-          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start">
-            ${sigEntries}
-          </div>
-        </div>
+        ${sigSectionHtml}
       </div>`:''}
       <div style="margin:16px 0 0;padding:14px 20px;background:linear-gradient(135deg,#f0f4f3,#e8f7f4);border-radius:10px;border-top:3px solid #2aab8e;display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -1472,7 +1611,7 @@ async function buildImageCanvas(d){
   return canvas;
 }
 
-function openPdfPreview(blob){
+function openImagePreview(blob){
   const url=URL.createObjectURL(blob);
   window.open(url,'_blank');
   setTimeout(()=>URL.revokeObjectURL(url),60000);
@@ -1486,25 +1625,12 @@ function downloadBlob(blob,fileName){
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
-async function sharePDF(file,d){
-  const shareData={
-    title:`[TBM] ${d.projName||'안전점검조회'}`,
-    text:`${d.workDate} / ${d.workPlace} / 작성자 ${d.author}`,
-    files:[file]
-  };
-  if(navigator.canShare&&navigator.canShare({files:[file]})){
-    await navigator.share(shareData);
-    return true;
-  }
-  return false;
-}
-
-async function previewPDF(){
+async function previewImage(){
   const d=collect();
   toast('이미지 생성 중...','ok');
   try{
     const{blob}=await makeImageFile(d);
-    openPdfPreview(blob);
+    openImagePreview(blob);
   }catch(e){
     console.error(e);
     toast('이미지 생성 오류','ng');
@@ -1515,6 +1641,14 @@ async function submitForm(){
   const d=collect();
   if(!chk(0)){return;}
 
+  // 서명 검증 - 하나도 없으면 확인 받기
+  const hasSig = signatures.mode==='photo'
+    ? !!signatures.photoSig
+    : Object.keys(signatures.drawSigs||{}).length > 0;
+  if(!hasSig){
+    if(!confirm('서명이 아직 등록되지 않았습니다.\n이대로 제출하시겠습니까?')) return;
+  }
+
   const bn=document.getElementById('bNext');
   const sp=document.getElementById('spin');
   const nt=document.getElementById('nTxt');
@@ -1522,6 +1656,9 @@ async function submitForm(){
 
   try{
     const{blob,file,fileName}=await makeImageFile(d);
+
+    // 제출 성공 시 자동저장 삭제
+    try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
 
     // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
@@ -1585,17 +1722,291 @@ async function submitForm(){
   }
 }
 
-function resetAll(){location.reload();}
+function resetAll(){
+  // 자동저장도 지우고 새로고침
+  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
+  location.reload();
+}
 
-// ── 서명 스텝 빌드 ──
+// ══════════════════════════════════════════════════════════
+//  자동 저장 (localStorage) — 텍스트 데이터만
+// ══════════════════════════════════════════════════════════
+const AUTOSAVE_KEY = 'tbm_autosave_v1';
+let autosaveTimer = null;
+
+function collectForSave(){
+  // 위험요소 선택 상태
+  const hazOn=[...document.querySelectorAll('.haz.on')].map(el=>el.textContent.trim());
+  // 안전조치 입력값
+  const safetyItems=[...document.querySelectorAll('.haz-safety-item')].map(item=>({
+    label: item.querySelector('.haz-safety-name')?.textContent.trim()||'',
+    icon: item.querySelector('.haz-safety-icon')?.textContent.trim()||'',
+    workContent: item.querySelector('.work-content-textarea')?.value||'',
+    action: item.querySelector('.haz-safety-textarea')?.value||'',
+    risk: item.dataset.risk||'',
+    riskAfter: item.dataset.riskAfter||'',
+  }));
+  return {
+    v: 2,
+    savedAt: new Date().toISOString(),
+    workDate: document.getElementById('workDate')?.value||'',
+    author: document.getElementById('author')?.value||'',
+    workPlace: document.getElementById('workPlace')?.value||'',
+    projName: document.getElementById('projName')?.value||'',
+    workContent: document.getElementById('workContent')?.value||'',
+    memberBox: document.getElementById('memberBox')?.value||'',
+    hazOn,
+    hazExtra: document.getElementById('hazExtra')?.value||'',
+    safetyItems,
+    safetyExtra: document.getElementById('safetyExtra')?.value||'',
+    incidentStatus,
+    incidentPerson: document.getElementById('incidentPerson')?.value||'',
+    sigMode: signatures.mode || 'draw',
+    curPage: cur,
+  };
+}
+
+function doAutosave(){
+  try{
+    const data = collectForSave();
+    // 내용이 거의 없으면 저장 안 함
+    if(!data.author && !data.projName && !data.memberBox && data.hazOn.length===0) return;
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+  }catch(e){ console.warn('autosave fail', e); }
+}
+
+// 디바운스 저장 (입력 후 800ms 대기)
+function scheduleAutosave(){
+  if(autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(doAutosave, 800);
+}
+
+function hasAutosave(){
+  try{
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    // 최소 조건: author 또는 projName 또는 멤버가 있어야 복원 대상
+    if(!d.author && !d.projName && !d.memberBox) return null;
+    return d;
+  }catch(e){ return null; }
+}
+
+function restoreAutosave(){
+  const d = hasAutosave();
+  if(!d) return;
+  try{
+    if(d.workDate) document.getElementById('workDate').value = d.workDate;
+    if(d.author) document.getElementById('author').value = d.author;
+    if(d.workPlace) document.getElementById('workPlace').value = d.workPlace;
+    if(d.projName) document.getElementById('projName').value = d.projName;
+    if(d.workContent) document.getElementById('workContent').value = d.workContent;
+    if(d.memberBox) document.getElementById('memberBox').value = d.memberBox;
+    if(d.hazExtra) document.getElementById('hazExtra').value = d.hazExtra;
+    if(d.safetyExtra) document.getElementById('safetyExtra').value = d.safetyExtra;
+    // 위험요소 선택 복원
+    if(Array.isArray(d.hazOn) && d.hazOn.length){
+      document.querySelectorAll('.haz').forEach(el=>{
+        if(d.hazOn.includes(el.textContent.trim())) el.classList.add('on');
+      });
+      // 안전조치 항목 생성 후 값 주입 (조용히)
+      buildSafetyInputs({silent:true});
+      if(Array.isArray(d.safetyItems)){
+        d.safetyItems.forEach(s=>{
+          const items=document.querySelectorAll('.haz-safety-item');
+          items.forEach(item=>{
+            const lbl=item.querySelector('.haz-safety-name')?.textContent.trim();
+            if(lbl===s.label){
+              const wc=item.querySelector('.work-content-textarea'); if(wc&&s.workContent) wc.value=s.workContent;
+              const ta=item.querySelector('.haz-safety-textarea');
+              if(ta && s.action){
+                ta.value=s.action;
+                ta.readOnly=false;
+                ta.style.background='#fff';
+                ta.style.borderColor='#2aab8e';
+                ta.style.borderStyle='solid';
+              }
+              if(s.risk){
+                item.dataset.risk=s.risk;
+                item.querySelectorAll('.risk-btn').forEach(b=>{
+                  const t=b.textContent.includes('상')?'상':b.textContent.includes('중')?'중':'하';
+                  if(t===s.risk) b.className='risk-btn '+(s.risk==='상'?'sel-high':s.risk==='중'?'sel-mid':'sel-low');
+                });
+              }
+              if(s.riskAfter){
+                item.dataset.riskAfter=s.riskAfter;
+                item.querySelectorAll('.risk-after-btn').forEach(b=>{
+                  const t=b.textContent.includes('상')?'상':b.textContent.includes('중')?'중':'하';
+                  if(t===s.riskAfter) b.className='risk-after-btn '+(s.riskAfter==='상'?'sel-high':s.riskAfter==='중'?'sel-mid':'sel-low');
+                });
+              }
+            }
+          });
+        });
+      }
+    }
+    // 환자 발생 여부
+    if(d.incidentStatus==='yes'){
+      setIncident('yes');
+      if(d.incidentPerson){
+        setTimeout(()=>{const ip=document.getElementById('incidentPerson'); if(ip) ip.value=d.incidentPerson;},50);
+      }
+    }
+    // 서명 모드 복원 (이미지는 재등록)
+    if(d.sigMode==='photo' || d.sigMode==='draw'){
+      signatures.mode = d.sigMode;
+    }
+    toast('💾 임시 저장된 내용을 불러왔습니다','ok');
+  }catch(e){ console.error('restore fail', e); }
+}
+
+// 임시저장 복원 안내 모달
+function showRestorePrompt(callback){
+  const d = hasAutosave();
+  if(!d){ callback(false); return; }
+
+  const savedTime = new Date(d.savedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const summary = [
+    d.author && `작성자: ${d.author}`,
+    d.projName && `프로젝트: ${d.projName}`,
+    d.memberBox && `참석자 ${d.memberBox.split(/[\n,，、]+/).filter(s=>s.trim()).length}명`,
+  ].filter(Boolean).join(' · ');
+
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.innerHTML=`
+    <div style="background:#fff;border-radius:20px;padding:0;width:100%;max-width:380px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="background:linear-gradient(135deg,#2aab8e,#1e8f76);padding:18px 20px">
+        <div style="color:#fff;font-size:16px;font-weight:800">💾 이어서 작성하시겠습니까?</div>
+        <div style="color:rgba(255,255,255,.75);font-size:11px;margin-top:3px">${savedTime}에 임시 저장된 내용이 있습니다</div>
+      </div>
+      <div style="padding:18px 20px;font-size:13px;color:#4a6860;line-height:1.7">
+        ${summary?`<div style="background:#f0faf8;border:1px solid #d4e6e1;border-radius:9px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:#1e8f76">📄 ${esc(summary)}</div>`:''}
+        <div style="font-size:12px;color:#8aada8">※ 텍스트 정보만 복원됩니다. 사진·서명은 다시 등록해주세요.</div>
+      </div>
+      <div style="padding:0 20px 18px;display:flex;gap:8px">
+        <button id="restoreNewBtn" style="flex:1;padding:12px;background:#f0f4f3;border:1.5px solid #d4e6e1;border-radius:11px;color:#8aada8;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🗑 새로 작성</button>
+        <button id="restoreYesBtn" style="flex:2;padding:12px;background:linear-gradient(135deg,#2aab8e,#1e8f76);border:none;border-radius:11px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📝 이어서 작성</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('restoreYesBtn').onclick=()=>{
+    modal.remove();
+    restoreAutosave();
+    callback(true);
+  };
+  document.getElementById('restoreNewBtn').onclick=()=>{
+    try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
+    modal.remove();
+    callback(false);
+  };
+}
+
+// 전역 입력 리스너 (페이지 1의 입력 필드들)
+function attachAutosaveListeners(){
+  const ids=['workDate','author','workPlace','projName','workContent','memberBox','hazExtra','safetyExtra','incidentPerson'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input', scheduleAutosave);
+    if(el && (el.tagName==='SELECT')) el.addEventListener('change', scheduleAutosave);
+  });
+  // hazExtra 변경 시 안전조치 영역도 재빌드
+  const hazExtra=document.getElementById('hazExtra');
+  if(hazExtra){
+    hazExtra.addEventListener('input', ()=>{
+      if(window._hazExtraTimer) clearTimeout(window._hazExtraTimer);
+      window._hazExtraTimer=setTimeout(()=>{
+        if(cur===0){
+          const hazOn = document.querySelectorAll('.haz.on').length;
+          const extra = hazExtra.value.trim();
+          if(hazOn>0 || extra) buildSafetyInputs({silent:true});
+          else {
+            document.getElementById('hazSafetyList').innerHTML='';
+            document.getElementById('noHazMsg').style.display='block';
+            document.getElementById('extraSafetyCard').style.display='none';
+          }
+        }
+      },600);
+    });
+  }
+  // 위험요소 토글, 위험도 버튼 등도 변경 감지
+  document.addEventListener('click', (e)=>{
+    if(e.target.closest('.haz') || e.target.closest('.risk-btn') || e.target.closest('.risk-after-btn') || e.target.closest('.incident-btn')){
+      scheduleAutosave();
+    }
+  });
+  // 동적 생성되는 안전조치 textarea 입력도 감지
+  document.addEventListener('input', (e)=>{
+    if(e.target.classList && (e.target.classList.contains('haz-safety-textarea') || e.target.classList.contains('work-content-textarea'))){
+      scheduleAutosave();
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  서명 시스템 (전역 토글: 직접서명 / 서명지 촬영)
+// ══════════════════════════════════════════════════════════
+// signatures 자료구조:
+//   { mode:'draw'|'photo', drawSigs:{이름:dataURL}, photoSig:dataURL|null }
+
+// 이름으로 접근하는 호환용 getter (PDF 렌더링 등에서 사용)
+function getSigDataFor(name){
+  if(signatures.mode==='photo'){
+    // 사진 모드에서는 모든 사람이 같은 사진을 공유(첫번째만 표시되도록 별도 처리 가능)
+    return signatures.photoSig ? {type:'photo', data:signatures.photoSig} : null;
+  }
+  const d = signatures.drawSigs && signatures.drawSigs[name];
+  return d ? {type:'draw', data:d} : null;
+}
+
+// 서명 완료 여부 (제출 단계에서 체크용)
+function hasAnySignature(){
+  if(signatures.mode==='photo') return !!signatures.photoSig;
+  return Object.keys(signatures.drawSigs||{}).length > 0;
+}
+
+// 모드 전환
+function setSigMode(mode){
+  signatures.mode = mode;
+  document.getElementById('sigModeDraw').classList.toggle('active', mode==='draw');
+  document.getElementById('sigModePhoto').classList.toggle('active', mode==='photo');
+  document.getElementById('sigDrawArea').style.display = mode==='draw' ? 'block' : 'none';
+  document.getElementById('sigPhotoArea').style.display = mode==='photo' ? 'block' : 'none';
+  if(mode==='draw'){
+    buildSigDrawList();
+  } else {
+    buildSigPhotoBox();
+  }
+}
+
+// 페이지 2 진입 시 호출
 function buildSignatureStep(){
+  // 현재 모드에 맞는 영역 빌드
+  if(signatures.mode==='photo'){
+    document.getElementById('sigModeDraw').classList.remove('active');
+    document.getElementById('sigModePhoto').classList.add('active');
+    document.getElementById('sigDrawArea').style.display='none';
+    document.getElementById('sigPhotoArea').style.display='block';
+    buildSigPhotoBox();
+  } else {
+    document.getElementById('sigModeDraw').classList.add('active');
+    document.getElementById('sigModePhoto').classList.remove('active');
+    document.getElementById('sigDrawArea').style.display='block';
+    document.getElementById('sigPhotoArea').style.display='none';
+    buildSigDrawList();
+  }
+}
+
+// ── 직접 서명 모드: 참석자별 순차 서명 리스트 ──
+function buildSigDrawList(){
   const raw=document.getElementById('memberBox').value;
   const members=raw.split(/[\n,，、]+/).map(s=>s.trim()).filter(Boolean);
   const list=document.getElementById('sigList');
   list.innerHTML='';
 
   if(!members.length){
-    list.innerHTML='<div style="text-align:center;color:var(--text3);padding:20px;font-size:14px">참석자가 없습니다. STEP 2로 돌아가 참석자를 입력해주세요.</div>';
+    list.innerHTML='<div style="text-align:center;color:var(--text3);padding:20px;font-size:14px">참석자가 없습니다. 이전 페이지로 돌아가 참석자를 입력해주세요.</div>';
     return;
   }
 
@@ -1603,26 +2014,31 @@ function buildSignatureStep(){
     const block=document.createElement('div');
     block.className='sig-member-block';
     block.id='sig_'+name;
-    const alreadySigned=signatures[name];
+    const already = signatures.drawSigs[name];
+
     block.innerHTML=`
       <div class="sig-member-header">
         <span class="sig-member-name">✍️ ${escV2(name)}</span>
-        <span class="sig-status${alreadySigned?' done':''}" id="sigSt_${escV2(name)}">${alreadySigned?'✅ 서명완료':'서명 대기'}</span>
+        <span class="sig-status${already?' done':''}">${already?'✅ 서명 완료':'서명 대기'}</span>
       </div>
-      ${alreadySigned
-        ? `<div style="padding:8px 12px"><img class="sig-preview" src="${alreadySigned}" style="display:block;width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:8px;border:1.5px solid var(--teal-m)"></div>
-           <div class="sig-actions"><button class="sig-clear" onclick="resetSig('${escV2(name)}')">다시 서명</button></div>`
+      ${already
+        ? `<div style="padding:8px 12px">
+             <img src="${already}" style="display:block;width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:8px;border:1.5px solid var(--teal-m);padding:4px">
+           </div>
+           <div class="sig-actions">
+             <button class="sig-clear" onclick="resetDrawSig('${escV2(name)}')" style="flex:1">🔄 다시 서명</button>
+           </div>`
         : `<div class="sig-canvas-wrap">
              <canvas class="sig-canvas" id="sc_${escV2(name)}" height="160"></canvas>
            </div>
            <div class="sig-actions">
              <button class="sig-clear" onclick="clearSigCanvas('${escV2(name)}')">지우기</button>
-             <button class="sig-done" onclick="saveSig('${escV2(name)}')">✅ 서명 완료</button>
+             <button class="sig-done" onclick="saveDrawSig('${escV2(name)}')">✅ 서명 완료</button>
            </div>`
       }
     `;
     list.appendChild(block);
-    if(!alreadySigned) initSigCanvas(name);
+    if(!already) initSigCanvas(name);
   });
 }
 
@@ -1661,17 +2077,16 @@ function clearSigCanvas(name){
   canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
 }
 
-function saveSig(name){
+function saveDrawSig(name){
   const canvas=document.getElementById('sc_'+name);
   if(!canvas)return;
-  // 빈 캔버스 체크
   const ctx=canvas.getContext('2d');
   const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
   const hasContent=data.some((v,i)=>i%4===3&&v>0);
   if(!hasContent){toast('서명을 해주세요','ng');return;}
-  signatures[name]=canvas.toDataURL('image/png');
+  signatures.drawSigs[name]=canvas.toDataURL('image/png');
   toast(`${name} 서명 완료!`,'ok');
-  buildSignatureStep(); // 다시 렌더링
+  buildSigDrawList();
   // 다음 미서명자로 스크롤
   setTimeout(()=>{
     const next=document.querySelector('.sig-member-block .sig-canvas-wrap');
@@ -1679,9 +2094,51 @@ function saveSig(name){
   },200);
 }
 
-function resetSig(name){
-  delete signatures[name];
-  buildSignatureStep();
+function resetDrawSig(name){
+  delete signatures.drawSigs[name];
+  buildSigDrawList();
+}
+
+// ── 서명지 촬영 모드: 단일 사진 업로드 ──
+function buildSigPhotoBox(){
+  const box=document.getElementById('sigPhotoBox');
+  if(!box)return;
+  const hasSig = !!signatures.photoSig;
+  box.innerHTML = `
+    <div class="sig-photo-slot ${hasSig?'has':''}" id="sigPhotoSlot" onclick="triggerSigPhoto()">
+      <input type="file" accept="image/*" capture="environment" id="sigPhotoInput" onchange="loadSigPhoto(this)">
+      ${hasSig
+        ? `<img src="${signatures.photoSig}">
+           <button class="sp-remove" onclick="removeSigPhoto(event)">×</button>`
+        : `<span class="sp-icon">📷</span>
+           <span class="sp-title">서명지 사진 촬영</span>
+           <span class="sp-sub">참석자 전원이 서명한 종이를 촬영해 주세요</span>`}
+    </div>
+    ${hasSig ? `<div style="font-size:11px;color:var(--teal2);font-weight:600;margin-top:8px;text-align:center">✅ 서명지 등록 완료</div>` : ''}
+  `;
+}
+
+function triggerSigPhoto(){
+  // 이미 업로드된 상태면 클릭 시 다시 업로드는 막음 (× 버튼으로만 제거)
+  if(signatures.photoSig) return;
+  document.getElementById('sigPhotoInput').click();
+}
+
+function loadSigPhoto(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    signatures.photoSig = e.target.result;
+    toast('서명지 사진 등록 완료!','ok');
+    buildSigPhotoBox();
+  };
+  r.readAsDataURL(inp.files[0]);
+}
+
+function removeSigPhoto(ev){
+  ev.stopPropagation();
+  signatures.photoSig = null;
+  buildSigPhotoBox();
 }
 
 // ── 직접 입력 모드 활성화 ──
@@ -1737,6 +2194,22 @@ function loadDefaultMeasure(btn){
 }
 
 updProg(0);
+
+// 실수로 페이지 닫거나 새로고침 시 경고
+window.addEventListener('beforeunload', function(e){
+  // 완료화면이면 경고 안 함
+  if(document.getElementById('doneScreen')?.classList.contains('show')) return;
+  // 작성 내용이 있을 때만 경고
+  const hasContent = document.getElementById('author')?.value.trim()
+    || document.getElementById('projName')?.value.trim()
+    || document.getElementById('memberBox')?.value.trim()
+    || document.querySelectorAll('.haz.on').length>0;
+  if(hasContent){
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
 </script>
 </body>
 </html>
