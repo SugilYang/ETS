@@ -937,8 +937,11 @@ function tryAccess(){
     ov.classList.add('hide');
     setTimeout(()=>{
       ov.style.display='none';
-      // 자동 저장된 내용이 있으면 복원 팝업, 아니면 공지 팝업
+      // 1. 임시저장 복원 팝업 (우선)
       showRestorePrompt((restored)=>{
+        // 2. 임시저장이 없으면 → 지난번 제출값(기본값) 자동 주입
+        if(!restored) applyLastValues();
+        // 3. 공지 팝업
         showNoticeIfNeeded();
       });
       attachAutosaveListeners();
@@ -1660,6 +1663,9 @@ async function submitForm(){
     // 제출 성공 시 자동저장 삭제
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
 
+    // 제출 성공 시 기본값 저장 (다음 작성 시 자동 주입용)
+    saveLastValues(d);
+
     // 완료 화면 전환
     document.getElementById('stepsWrap').style.display='none';
     document.getElementById('navBar').style.display='none';
@@ -1723,16 +1729,189 @@ async function submitForm(){
 }
 
 function resetAll(){
-  // 자동저장도 지우고 새로고침
+  // 자동저장 삭제 (기본값은 유지 — 다음 작성 시 자동 주입)
   try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
-  location.reload();
+
+  // 모든 필드 초기화
+  ['workDate','author','workPlace','projName','workContent','memberBox','hazExtra','safetyExtra','incidentPerson'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  // 오늘 날짜 재설정
+  const today2 = new Date();
+  const koreaDate2 = new Date(today2.getTime() + (9*60*60*1000));
+  const wd=document.getElementById('workDate');
+  if(wd) wd.value = koreaDate2.toISOString().slice(0,10);
+
+  // 위험요소 선택 해제
+  document.querySelectorAll('.haz.on').forEach(el=>el.classList.remove('on'));
+  // 안전조치 영역 초기화
+  const list=document.getElementById('hazSafetyList');
+  if(list) list.innerHTML='';
+  const noHaz=document.getElementById('noHazMsg');
+  if(noHaz) noHaz.style.display='block';
+  const extraCard=document.getElementById('extraSafetyCard');
+  if(extraCard) extraCard.style.display='none';
+
+  // 사진 초기화
+  photos[0]=null; photos[1]=null;
+  [0,1].forEach(i=>{
+    const s=document.getElementById('ps'+i);
+    if(s){
+      const img=s.querySelector('img'); if(img) img.remove();
+      s.classList.remove('has');
+      const inp=document.getElementById('pf'+i); if(inp) inp.value='';
+      const sv=document.getElementById('sv'+i); if(sv) sv.style.display='none';
+    }
+  });
+  const svWrap=document.getElementById('sv12wrap'); if(svWrap) svWrap.style.display='none';
+
+  // 서명 초기화
+  signatures.mode='draw';
+  signatures.drawSigs={};
+  signatures.photoSig=null;
+
+  // 환자 여부 초기화
+  incidentStatus='none';
+  setIncident('none');
+
+  // 기존 안내 배너 제거 (기본값 주입 시 다시 뜸)
+  const banner=document.getElementById('lastValuesBanner');
+  if(banner) banner.remove();
+
+  // 완료 화면 닫고 첫 페이지로
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('stepsWrap').style.display='block';
+  document.getElementById('navBar').style.display='flex';
+  // 추가된 공유 버튼 제거
+  ['kakaoShareBtn','kakaoDownBtn','kakaoOpenBtn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.remove();
+  });
+
+  // 페이지 1로 복귀
+  const pages=document.querySelectorAll('.step');
+  pages.forEach(p=>p.classList.remove('active'));
+  cur=0;
+  pages[0].classList.add('active');
+  updProg(0);
+
+  // 지난번 기본값 자동 주입
+  applyLastValues();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+  toast('새 TBM 작성을 시작합니다','ok');
 }
 
 // ══════════════════════════════════════════════════════════
 //  자동 저장 (localStorage) — 텍스트 데이터만
 // ══════════════════════════════════════════════════════════
 const AUTOSAVE_KEY = 'tbm_autosave_v1';
+const LASTVALUES_KEY = 'tbm_last_values_v1';  // 제출 완료 후 저장하는 기본값
 let autosaveTimer = null;
+
+// 제출 완료 시 호출 - 5개 기본 필드 저장
+function saveLastValues(d){
+  try{
+    const last = {
+      savedAt: new Date().toISOString(),
+      author: d.author||'',
+      workPlace: d.workPlace||'',
+      projName: d.projName||'',
+      workContent: d.workContent||'',
+      memberBox: document.getElementById('memberBox')?.value||'',
+    };
+    // 내용이 거의 없으면 저장 안 함
+    if(!last.author && !last.projName) return;
+    localStorage.setItem(LASTVALUES_KEY, JSON.stringify(last));
+  }catch(e){ console.warn('saveLastValues fail', e); }
+}
+
+// 다음 접속 시 호출 - 저장된 기본값 불러와 자동 주입
+function applyLastValues(){
+  try{
+    const raw = localStorage.getItem(LASTVALUES_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(!d.author && !d.projName) return false;
+
+    // 작업일자는 건드리지 않음 (이미 오늘 날짜로 세팅됨)
+    if(d.author){
+      const el=document.getElementById('author');
+      if(el && !el.value) el.value = d.author;
+    }
+    if(d.workPlace){
+      const el=document.getElementById('workPlace');
+      if(el && !el.value) el.value = d.workPlace;
+    }
+    if(d.projName){
+      const el=document.getElementById('projName');
+      if(el && !el.value) el.value = d.projName;
+    }
+    if(d.workContent){
+      const el=document.getElementById('workContent');
+      if(el && !el.value) el.value = d.workContent;
+    }
+    if(d.memberBox){
+      const el=document.getElementById('memberBox');
+      if(el && !el.value) el.value = d.memberBox;
+    }
+
+    // 상단 안내 배너 표시
+    showLastValuesBanner(d.savedAt);
+    return true;
+  }catch(e){ console.warn('applyLastValues fail', e); return false; }
+}
+
+// 자동 주입 알림 배너
+function showLastValuesBanner(savedAt){
+  // PAGE 1 영역에 배너 삽입 (중복 방지)
+  if(document.getElementById('lastValuesBanner')) return;
+  const page=document.getElementById('s0');
+  if(!page) return;
+  const hero=page.querySelector('.hero');
+  if(!hero) return;
+
+  const savedDate = savedAt ? new Date(savedAt) : null;
+  const dateStr = savedDate ? savedDate.toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'}) : '';
+
+  const banner=document.createElement('div');
+  banner.id='lastValuesBanner';
+  banner.style.cssText=`
+    background:linear-gradient(135deg,#f0faf8,#e8f7f4);
+    border:1.5px solid #b2e4d8;border-radius:12px;
+    padding:10px 14px;margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+    animation:fadeIn .4s ease;
+  `;
+  banner.innerHTML=`
+    <span style="font-size:18px">💾</span>
+    <div style="flex:1;font-size:12px;line-height:1.5;color:#1e8f76">
+      <div style="font-weight:700">이전 작성값을 불러왔습니다${dateStr?` <span style="font-weight:500;color:#8aada8">· ${dateStr} 저장</span>`:''}</div>
+      <div style="color:#4a6860;font-size:11px;margin-top:1px">수정이 필요한 부분만 변경하세요</div>
+    </div>
+    <button type="button" onclick="clearLastValues()"
+      style="background:#fff;border:1.5px solid #d4e6e1;border-radius:8px;padding:6px 10px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;color:#8aada8;cursor:pointer;white-space:nowrap">
+      🗑 전체 지우기
+    </button>
+  `;
+  hero.parentNode.insertBefore(banner, hero.nextSibling);
+}
+
+// 기본값 전체 삭제 (안내 배너의 "전체 지우기" 버튼)
+function clearLastValues(){
+  if(!confirm('저장된 기본값을 모두 삭제하고 빈 상태로 시작하시겠습니까?')) return;
+  try{ localStorage.removeItem(LASTVALUES_KEY); }catch(e){}
+  // 필드 초기화
+  ['author','workPlace','projName','workContent','memberBox'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  // 배너 제거
+  const banner=document.getElementById('lastValuesBanner');
+  if(banner) banner.remove();
+  toast('기본값을 지웠습니다','ok');
+}
 
 function collectForSave(){
   // 위험요소 선택 상태
