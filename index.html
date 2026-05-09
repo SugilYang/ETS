@@ -1661,6 +1661,47 @@ async function submitForm(){
   try{
     const{blob,file,fileName}=await makeImageFile(d);
 
+    // ── Google Drive + Sheets 자동 저장 ──
+    nt.textContent='기록 저장 중...';
+    try{
+      const GAS_URL='https://script.google.com/macros/s/AKfycbzhy7LUVE_HKd9IUXhcZdksbL1Efzesssym-cuauIcGpLXS9YA71mrZxUlj4vJ45rD_9A/exec';
+
+      // 1) Sheets 저장 (텍스트)
+      await fetch(GAS_URL,{
+        method:'POST',
+        body:JSON.stringify({
+          type:'sheet',
+          workDate:d.workDate,
+          author:d.author,
+          workPlace:d.workPlace,
+          projName:d.projName,
+          members:d.members,
+          tbmDuration:d.tbmDuration,
+          hazards:d.hazards,
+          incidentStatus:d.incidentStatus,
+        })
+      });
+
+      // 2) Drive 저장 (이미지)
+      const reader=new FileReader();
+      const imageBase64=await new Promise(res=>{reader.onload=e=>res(e.target.result);reader.readAsDataURL(blob);});
+      await fetch(GAS_URL,{
+        method:'POST',
+        body:JSON.stringify({
+          type:'drive',
+          workDate:d.workDate,
+          fileName:fileName,
+          imageBase64:imageBase64,
+        })
+      });
+
+      toast('📊 Drive·Sheets 저장 완료!','ok');
+    }catch(gasErr){
+      console.warn('GAS 저장 실패(앱은 계속):', gasErr);
+      toast('⚠️ 자동저장 실패 — 카카오톡 공유는 정상','ng');
+    }
+    // ── 자동 저장 끝 ──
+
     // 제출 성공 시 자동저장 삭제
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
 
