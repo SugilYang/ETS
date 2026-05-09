@@ -1033,7 +1033,11 @@ function chk(s){
     if(!document.getElementById('author').value.trim()){toast('작성자 이름을 입력해주세요.','ng');return false;}
     if(!document.getElementById('workPlace').value){toast('작업장소를 선택해주세요.','ng');return false;}
     if(!document.getElementById('projName').value.trim()){toast('프로젝트명을 입력해주세요.','ng');return false;}
-    // 안전조치 입력 검증 (페이지 1 안에 포함되어 있으므로 여기서 체크)
+    // 위험요소 선택 검증
+    const hazOn=document.querySelectorAll('.haz.on');
+    const hazExtra=document.getElementById('hazExtra')?.value.trim()||'';
+    if(hazOn.length===0&&!hazExtra){toast('위험요소를 1개 이상 선택해주세요.','ng');return false;}
+    // 안전조치 입력 검증
     const items=document.querySelectorAll('.haz-safety-textarea');
     let ok=true;
     items.forEach(ta=>{if(!ta.value.trim())ok=false;});
@@ -1677,7 +1681,7 @@ async function submitForm(){
           projName:d.projName,
           members:d.members,
           tbmDuration:d.tbmDuration,
-          hazards:d.hazards,
+          hazards:d.hazards.map(h=>h.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2300}-\u{23FF}☠💧🌧🦺⚙🔩✂💥⬆🪜🏗🪨⚡🔥💨🔊🌡🚧]+\s*/u,'')),
           incidentStatus:d.incidentStatus,
         })
       });
