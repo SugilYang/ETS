@@ -311,6 +311,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--teal);background:var(
 textarea{resize:vertical;min-height:96px;line-height:1.65}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 
+/* 작업장소 구분 (국내/해외) 버튼 */
+.region-btns{display:flex;gap:10px;margin-bottom:10px}
+.region-btn{
+  flex:1;padding:12px;border-radius:11px;border:1.5px solid var(--border);
+  background:var(--bg);font-family:'Noto Sans KR',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .18s;
+}
+.region-btn:active{transform:scale(.98)}
+.region-btn.on{
+  background:var(--teal-l);border-color:var(--teal);color:var(--teal2);font-weight:700;
+  box-shadow:0 2px 8px rgba(42,171,142,.18);
+}
+
 .member-box{
   width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:11px;
   padding:13px 14px;min-height:100px;font-size:15px;color:var(--text);
@@ -653,6 +666,10 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
       </div>
       <div class="fld">
         <label>작업장소 <span class="req">*</span></label>
+        <div class="region-btns">
+          <button type="button" class="region-btn on" id="regionDomestic" onclick="setRegion('국내')">🏢 자사 (국내)</button>
+          <button type="button" class="region-btn" id="regionOverseas" onclick="setRegion('해외')">✈️ 해외 사이트</button>
+        </div>
         <select id="workPlace">
           <option value="">— 선택해주세요 —</option>
           <option>본사 A동</option><option>본사 B동</option>
@@ -935,6 +952,41 @@ const NOTICE = {
 
 문의사항은 010-3469-2346으로 연락 바랍니다.`
 };
+
+// ══════════════════════════════════════════════════════════
+//  작업장소 구분 (국내 / 해외 사이트)
+// ══════════════════════════════════════════════════════════
+const DOMESTIC_SITES = ['본사 A동','본사 B동','본사 C동','본사 D동','2공장 본동','2공장 증축동'];
+const OVERSEAS_SITES = ['UC 1동','UC 2동','ESMI_LS','ESMI','ESHD','ESHG','ESOT'];
+let workRegion = '국내';
+
+// 구분 버튼 클릭 → 해당 지역의 작업장소 목록으로 교체
+function setRegion(r){
+  workRegion = r;
+  const db = document.getElementById('regionDomestic');
+  const ob = document.getElementById('regionOverseas');
+  if(db) db.classList.toggle('on', r==='국내');
+  if(ob) ob.classList.toggle('on', r==='해외');
+  const sel = document.getElementById('workPlace');
+  if(!sel) return;
+  const prev = sel.value;
+  const sites = r==='해외' ? OVERSEAS_SITES : DOMESTIC_SITES;
+  sel.innerHTML = '<option value="">— 선택해주세요 —</option>' + sites.map(s=>`<option>${s}</option>`).join('');
+  if(sites.includes(prev)) sel.value = prev;
+}
+
+// 작업장소 값으로 국내/해외 판별 (GAS 전송용)
+function getRegion(workPlace){
+  return OVERSEAS_SITES.includes(workPlace) ? '해외' : '국내';
+}
+
+// 저장된 값 복원용 — 값에 맞는 지역으로 자동 전환 후 select에 값 설정
+function setWorkPlaceValue(v){
+  if(!v) return;
+  setRegion(OVERSEAS_SITES.includes(v) ? '해외' : '국내');
+  const sel = document.getElementById('workPlace');
+  if(sel) sel.value = v;
+}
 
 // ══════════════════════════════════════════════════════════
 //  접근 제어 로직
@@ -1417,7 +1469,7 @@ function buildSum(){
   document.getElementById('sumCard').innerHTML=`
     <div class="sum-item"><div class="sk">작업일자</div><div class="sv">${esc(d.workDate)||'-'}</div></div>
     <div class="sum-item"><div class="sk">작성자</div><div class="sv">${esc(d.author)||'-'}</div></div>
-    <div class="sum-item"><div class="sk">작업장소</div><div class="sv">${esc(d.workPlace)||'-'}</div></div>
+    <div class="sum-item"><div class="sk">작업장소</div><div class="sv">${esc(d.workPlace)||'-'} <span style="font-size:11px;color:#8aada8">(${getRegion(d.workPlace)})</span></div></div>
     <div class="sum-item"><div class="sk">프로젝트명</div><div class="sv">${esc(d.projName)||'-'}</div></div>
     <div class="sum-item"><div class="sk">작업내용</div><div class="sv">${esc(d.workContent)||'-'}</div></div>
     <div class="sum-item"><div class="sk">TBM 시간</div><div class="sv">⏱ ${d.tbmDuration}분 진행</div></div>
@@ -1539,7 +1591,7 @@ async function buildImageCanvas(d){
         </div>
         <div style="background:#f0f4f3;border-radius:10px;padding:12px 14px;border-left:3px solid #2aab8e">
           <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:4px">작업장소</div>
-          <div style="font-size:15px;font-weight:700;color:#1a2b28">${d.workPlace||'-'}</div>
+          <div style="font-size:15px;font-weight:700;color:#1a2b28">${d.workPlace||'-'} <span style="font-size:10px;color:#8aada8;font-weight:600">${getRegion(d.workPlace)}</span></div>
         </div>
         <div style="background:#f0f4f3;border-radius:10px;padding:12px 14px;border-left:3px solid #2aab8e">
           <div style="font-size:10px;font-weight:700;color:#8aada8;letter-spacing:1px;margin-bottom:4px">참석 인원</div>
@@ -1687,6 +1739,7 @@ async function submitForm(){
         method:'POST',
         body:JSON.stringify({
           type:'sheet',
+          region:getRegion(d.workPlace),
           workDate:d.workDate,
           author:d.author,
           workPlace:d.workPlace,
@@ -1705,6 +1758,7 @@ async function submitForm(){
         method:'POST',
         body:JSON.stringify({
           type:'drive',
+          region:getRegion(d.workPlace),
           workDate:d.workDate,
           fileName:fileName,
           imageBase64:imageBase64,
@@ -1795,6 +1849,8 @@ function resetAll(){
     const el=document.getElementById(id);
     if(el) el.value='';
   });
+  // 작업장소 구분 초기화 (국내 기본)
+  setRegion('국내');
   // 오늘 날짜 재설정
   const today2 = new Date();
   const koreaDate2 = new Date(today2.getTime() + (9*60*60*1000));
@@ -1900,7 +1956,7 @@ function applyLastValues(){
     }
     if(d.workPlace){
       const el=document.getElementById('workPlace');
-      if(el && !el.value) el.value = d.workPlace;
+      if(el && !el.value) setWorkPlaceValue(d.workPlace);
     }
     if(d.projName){
       const el=document.getElementById('projName');
@@ -2035,7 +2091,7 @@ function restoreAutosave(){
   try{
     if(d.workDate) document.getElementById('workDate').value = d.workDate;
     if(d.author) document.getElementById('author').value = d.author;
-    if(d.workPlace) document.getElementById('workPlace').value = d.workPlace;
+    if(d.workPlace) setWorkPlaceValue(d.workPlace);
     if(d.projName) document.getElementById('projName').value = d.projName;
     if(d.workContent) document.getElementById('workContent').value = d.workContent;
     if(d.memberBox) document.getElementById('memberBox').value = d.memberBox;
