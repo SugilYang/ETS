@@ -1379,23 +1379,66 @@ function collect(){
 }
 
 function trigPh(i){document.getElementById('pf'+i).click();}
+
+// ── 사진 자동 압축 (메모리 부족으로 인한 페이지 강제 새로고침 방지) ──
+// 카메라 원본(5~12MB)을 그대로 올리면 저사양 폰에서 브라우저가 메모리 부족으로
+// 페이지를 리로드함 → 긴 변 최대 1400px, JPEG 85%로 축소 (화질 영향 거의 없음)
+function compressImage(file, maxDim, quality){
+  maxDim = maxDim || 1400;
+  quality = quality || 0.85;
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onerror=()=>reject(new Error('read fail'));
+    r.onload=e=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('img fail'));
+      img.onload=()=>{
+        try{
+          let w=img.width, h=img.height;
+          const maxSide=Math.max(w,h);
+          if(maxSide>maxDim){
+            const ratio=maxDim/maxSide;
+            w=Math.round(w*ratio); h=Math.round(h*ratio);
+          }
+          const c=document.createElement('canvas');
+          c.width=w; c.height=h;
+          const ctx=c.getContext('2d');
+          ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
+          ctx.drawImage(img,0,0,w,h);
+          resolve(c.toDataURL('image/jpeg',quality));
+        }catch(err){ reject(err); }
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function applyLoadedPhoto(i,dataUrl){
+  photos[i]=dataUrl;
+  const slot=document.getElementById('ps'+i);
+  let img=slot.querySelector('img');
+  if(!img){img=document.createElement('img');slot.appendChild(img);}
+  img.src=dataUrl;
+  slot.classList.add('has');
+  // 저장 버튼 표시
+  const sv=document.getElementById('sv'+i);
+  if(sv){sv.style.display='flex';}
+  const wrap=document.getElementById('sv12wrap');
+  if(wrap){wrap.style.display='flex';}
+}
+
 function loadPh(i,inp){
   if(!inp.files[0])return;
-  const r=new FileReader();
-  r.onload=e=>{
-    photos[i]=e.target.result;
-    const slot=document.getElementById('ps'+i);
-    let img=slot.querySelector('img');
-    if(!img){img=document.createElement('img');slot.appendChild(img);}
-    img.src=e.target.result;
-    slot.classList.add('has');
-    // 저장 버튼 표시
-    const sv=document.getElementById('sv'+i);
-    if(sv){sv.style.display='flex';}
-    const wrap=document.getElementById('sv12wrap');
-    if(wrap){wrap.style.display='flex';}
-  };
-  r.readAsDataURL(inp.files[0]);
+  const f=inp.files[0];
+  compressImage(f).then(dataUrl=>{
+    applyLoadedPhoto(i,dataUrl);
+  }).catch(()=>{
+    // 압축 실패 시 원본으로 대체 (기존 동작)
+    const r=new FileReader();
+    r.onload=e=>applyLoadedPhoto(i,e.target.result);
+    r.readAsDataURL(f);
+  });
 }
 function rmPh(ev,i){
   ev.stopPropagation();
@@ -2420,13 +2463,22 @@ function triggerSigPhoto(){
 
 function loadSigPhoto(inp){
   if(!inp.files[0])return;
-  const r=new FileReader();
-  r.onload=e=>{
-    signatures.photoSig = e.target.result;
+  const f=inp.files[0];
+  // 서명지는 글씨 판독이 필요하므로 조금 더 크게 (1600px)
+  compressImage(f,1600,0.85).then(dataUrl=>{
+    signatures.photoSig = dataUrl;
     toast('서명지 사진 등록 완료!','ok');
     buildSigPhotoBox();
-  };
-  r.readAsDataURL(inp.files[0]);
+  }).catch(()=>{
+    // 압축 실패 시 원본으로 대체 (기존 동작)
+    const r=new FileReader();
+    r.onload=e=>{
+      signatures.photoSig = e.target.result;
+      toast('서명지 사진 등록 완료!','ok');
+      buildSigPhotoBox();
+    };
+    r.readAsDataURL(f);
+  });
 }
 
 function removeSigPhoto(ev){
