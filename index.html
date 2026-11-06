@@ -588,7 +588,8 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
   </div>
   <div class="ac-footer">
     허가된 ETS 임직원 및 협력업체 근로자만 사용 가능합니다<br>
-    문의: 경영지원 양수길 책임 010-3469-2346</div>
+    문의: 경영지원 양수길 책임 010-3469-2346<br>
+    <span id="acVer" style="color:rgba(126,245,220,.45);font-weight:600;letter-spacing:.5px"></span></div>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -614,7 +615,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
     <div class="hdr-company">ETS</div>
     <div class="hdr-title">안전점검조회<span>(TBM)</span></div>
   </div>
-  <div class="hdr-dev">개발자<strong>양수길</strong></div>
+  <div class="hdr-dev">개발자<strong>양수길</strong><span id="hdrVer" style="display:block;font-size:9px;color:rgba(255,255,255,.5);margin-top:1px"></span></div>
 </header>
 
 <div class="prog-wrap">
@@ -929,6 +930,19 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 // ══════════════════════════════════════════════════════════
 //  ⚙️  관리자 설정 — 이 부분만 수정하세요 (GitHub에서)
 // ══════════════════════════════════════════════════════════
+
+// 앱 버전 — 업데이트할 때마다 이 두 값을 변경하세요 (화면에 자동 표시됨)
+const APP_VERSION = 'V6.1';
+const APP_UPDATED = '2026-11-06';
+
+// 버전 표시 (접근코드 화면 하단 + 앱 헤더)
+(function showVersion(){
+  const t = APP_VERSION + ' · ' + APP_UPDATED + ' 업데이트';
+  const a = document.getElementById('acVer');
+  if(a) a.textContent = t;
+  const h = document.getElementById('hdrVer');
+  if(h) h.textContent = t;
+})();
 
 // 접근 코드 (여러 개 가능)
 const ACCESS_CODES = ['1111'];
