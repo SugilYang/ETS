@@ -932,8 +932,8 @@ textarea{resize:vertical;min-height:96px;line-height:1.65}
 // ══════════════════════════════════════════════════════════
 
 // 앱 버전 — 업데이트할 때마다 이 두 값을 변경하세요 (화면에 자동 표시됨)
-const APP_VERSION = 'V6.1';
-const APP_UPDATED = '2026-11-06';
+const APP_VERSION = 'V6.2';
+const APP_UPDATED = '2026-11-07';
 
 // 버전 표시 (접근코드 화면 하단 + 앱 헤더)
 (function showVersion(){
@@ -1591,7 +1591,7 @@ async function buildImageCanvas(d){
   const sigSectionHtml = sigMode==='photo' && photoSig
     ? `<div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:10px 12px">
          <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:6px">📷 서명지 사진</div>
-         <img src="${photoSig}" style="width:100%;max-height:420px;object-fit:contain;display:block;border-radius:8px;background:#fff">
+         <img src="${photoSig}" style="width:100%;height:auto;display:block;border-radius:8px;background:#fff">
        </div>`
     : `<div style="background:#f8f9ff;border:1.5px solid #e0e0f0;border-radius:10px;padding:14px 16px">
          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start">
@@ -1723,6 +1723,11 @@ async function buildImageCanvas(d){
 
   document.body.appendChild(wrap);
   await document.fonts.ready;
+  // 보고서 안 모든 이미지(사진·서명)가 로드 완료될 때까지 대기 — 높이 오측정·이미지 깨짐 방지
+  await Promise.all([...wrap.querySelectorAll('img')].map(img=>{
+    if(img.complete && img.naturalWidth>0) return Promise.resolve();
+    return new Promise(res=>{ img.onload=res; img.onerror=res; setTimeout(res,3000); });
+  }));
   await new Promise(r=>setTimeout(r,300));
 
   const canvas=await html2canvas(wrap,{
